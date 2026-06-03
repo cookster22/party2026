@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lease End Party 2026 — Waivers</title>
+  <link rel="icon" type="image/png" href="/le-logo.png">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,6 +37,16 @@
     }
     .nav a:hover { color: #f5d080; }
     .nav a.active { color: #f5d080; border-bottom-color: #b8860b; }
+    .nav-logo {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 32px;
+      background: white;
+      border-radius: 5px;
+      padding: 3px 6px;
+    }
 
     /* HERO */
     .hero {
@@ -196,9 +207,10 @@
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" style="position:relative;">
   <a href="/index.html">🏨 Hotel & Shuttle</a>
   <a href="/waivers.html" class="active">📋 Waivers</a>
+  <img src="/le-logo.png" class="nav-logo" alt="Lease End" />
 </nav>
 
 <div class="hero">
