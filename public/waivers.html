@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lease End Party 2026 — Waivers</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a120b;
+      color: #f5ece0;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      background: #120d07;
+      border-bottom: 2px solid #3a2510;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 16px;
+    }
+    .nav a {
+      display: inline-block;
+      padding: 14px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #8a7060;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -2px;
+    }
+    .nav a:hover { color: #f5d080; }
+    .nav a.active { color: #f5d080; border-bottom-color: #b8860b; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #2c1a0e 0%, #3d2410 50%, #2c1a0e 100%);
+      border-bottom: 3px solid #b8860b;
+      padding: 28px 24px 24px;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; color: #f5d080; margin-bottom: 4px; }
+    .hero .subtitle { font-size: 0.95rem; color: #c9a96e; margin-bottom: 20px; }
+
+    .waiver-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .waiver-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(180,60,30,0.2);
+      border: 1px solid rgba(220,100,60,0.5);
+      border-radius: 8px;
+      padding: 10px 18px;
+      color: #f5a070;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .waiver-link-btn:hover { background: rgba(180,60,30,0.35); }
+    .waiver-link-btn .badge {
+      background: rgba(180,60,30,0.4);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      color: #ffb090;
+    }
+
+    .instructions {
+      background: rgba(184,134,11,0.1);
+      border: 1px solid rgba(184,134,11,0.25);
+      border-radius: 10px;
+      padding: 12px 20px;
+      max-width: 580px;
+      margin: 0 auto;
+      font-size: 0.86rem;
+      color: #c9a96e;
+      text-align: left;
+      line-height: 1.6;
+    }
+    .instructions strong { color: #f5d080; }
+
+    /* STATS */
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 20px 16px 4px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .stat-chip {
+      background: #2a1a0e;
+      border: 1px solid #3a2510;
+      border-radius: 8px;
+      padding: 10px 18px;
+      text-align: center;
+      min-width: 110px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .stat-chip:hover, .stat-chip.active { border-color: #b8860b; background: rgba(184,134,11,0.12); }
+    .stat-chip .num { font-size: 1.4rem; font-weight: 700; }
+    .stat-chip .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: #9a8060; margin-top: 2px; }
+    .stat-chip.green .num { color: #90ee90; }
+    .stat-chip.yellow .num { color: #ffd700; }
+    .stat-chip.red .num { color: #ff8070; }
+    .stat-chip.all .num { color: #f5d080; }
+
+    /* SEARCH */
+    .search-section {
+      padding: 16px 16px 8px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 100%;
+      padding: 13px 44px 13px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 2px solid #4a3020;
+      background: #2a1a0e;
+      color: #f5ece0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: #b8860b; }
+    .search-wrap input::placeholder { color: #6a5040; }
+    .search-wrap .clear-btn {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #6a5040; font-size: 1.2rem; cursor: pointer; display: none;
+    }
+
+    /* TABLE */
+    .table-section {
+      padding: 8px 16px 48px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .result-count { font-size: 0.82rem; color: #7a6050; margin-bottom: 10px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #9a8060; padding: 8px 12px;
+      border-bottom: 1px solid #3a2a1a;
+    }
+    tbody tr { border-bottom: 1px solid #2a1e14; transition: background 0.15s; }
+    tbody tr:hover { background: rgba(184,134,11,0.07); }
+    tbody td { padding: 10px 12px; font-size: 0.9rem; vertical-align: middle; }
+
+    .name-cell { font-weight: 600; color: #f5ece0; }
+
+    .badge-done {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(60,160,60,0.18); border: 1px solid rgba(80,180,80,0.35);
+      border-radius: 6px; padding: 3px 10px; font-size: 0.8rem; color: #90ee90;
+    }
+    .badge-pending {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(200,160,0,0.15); border: 1px solid rgba(220,180,0,0.35);
+      border-radius: 6px; padding: 3px 10px; font-size: 0.8rem; color: #ffd060;
+    }
+    .badge-none {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(180,60,30,0.15); border: 1px solid rgba(200,80,50,0.3);
+      border-radius: 6px; padding: 3px 10px; font-size: 0.8rem; color: #ff8070;
+    }
+
+    .overall-done { color: #90ee90; font-size: 1.1rem; }
+    .overall-partial { color: #ffd060; font-size: 1.1rem; }
+    .overall-none { color: #ff8070; font-size: 1.1rem; }
+
+    .no-results { text-align: center; padding: 40px 20px; color: #6a5040; font-style: italic; }
+
+    mark { background: rgba(184,134,11,0.35); color: inherit; border-radius: 2px; }
+
+    @media (max-width: 500px) {
+      thead th:nth-child(4) { display: none; }
+      tbody td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/index.html">🏨 Hotel & Shuttle</a>
+  <a href="/waivers.html" class="active">📋 Waivers</a>
+</nav>
+
+<div class="hero">
+  <h1>📋 Waiver Status</h1>
+  <p class="subtitle">Every attendee must sign <strong>both</strong> waivers before Saturday, June 6</p>
+
+  <div class="waiver-links">
+    <a class="waiver-link-btn" href="https://waiver.smartwaiver.com/w/n1qncqjkdme8eu3xud26h/web/" target="_blank" rel="noopener">
+      <span>Sign Snowbasin Waiver</span>
+      <span class="badge">Required</span>
+    </a>
+    <a class="waiver-link-btn" href="https://waiver.smartwaiver.com/w/hdbohnp4evpbp3y1unsdp7/web/" target="_blank" rel="noopener">
+      <span>Sign Buck Wild Waiver</span>
+      <span class="badge">Required</span>
+    </a>
+  </div>
+
+  <div class="instructions">
+    <strong>How to use this page:</strong> Find your name below. You need a ✅ on <em>both</em> waivers.
+    If you see ❌ or ⚠️, click the link above to sign. <strong>Plus-ones must sign too.</strong>
+    If your name is missing or shows wrong, the waiver may have been submitted under a nickname — re-sign using your full legal first and last name.
+  </div>
+</div>
+
+<div class="stats-bar" id="statsBar">
+  <div class="stat-chip all" data-filter="all" onclick="setFilter('all',this)">
+    <div class="num" id="statAll">—</div>
+    <div class="lbl">Total</div>
+  </div>
+  <div class="stat-chip green" data-filter="both" onclick="setFilter('both',this)">
+    <div class="num" id="statBoth">—</div>
+    <div class="lbl">Both Signed ✅</div>
+  </div>
+  <div class="stat-chip yellow" data-filter="partial" onclick="setFilter('partial',this)">
+    <div class="num" id="statPartial">—</div>
+    <div class="lbl">Incomplete ⚠️</div>
+  </div>
+  <div class="stat-chip red" data-filter="none" onclick="setFilter('none',this)">
+    <div class="num" id="statNone">—</div>
+    <div class="lbl">None Signed ❌</div>
+  </div>
+</div>
+
+<div class="search-section">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search by name…" autocomplete="off" />
+    <button class="clear-btn" id="clearBtn">✕</button>
+  </div>
+</div>
+
+<div class="table-section">
+  <div class="result-count" id="resultCount"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Snowbasin</th>
+        <th>Buck Wild</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none">No one found.</div>
+</div>
+
+<script>
+// [first, last, snowbasin_status, buckwild_status]
+// status: 'done' | 'pending' | 'none'
+const PEOPLE = [
+  ["Gianfranco","Aciego","none","none"],
+  ["Ethan","Aguinaga","none","none"],
+  ["Jaime","Alamillo","done","done"],
+  ["Aaron","Albrechtsen","none","none"],
+  ["Burke","Alder","none","none"],
+  ["Easton","Anderson","done","none"],
+  ["Julie","Anderson","done","none"],
+  ["Rhett","Anderson","none","none"],
+  ["Dallas","Andrade","none","none"],
+  ["Brenda","Arambula","none","none"],
+  ["Carlee","Arthur","done","none"],
+  ["Zach","Baker","done","none"],
+  ["Austin","Bakker","done","done"],
+  ["Shane","Ball","none","none"],
+  ["Dustin","Barrilleaux","done","done"],
+  ["Nermin","Bektic","done","done"],
+  ["Madeline","Birtcher","done","done"],
+  ["Daniel","Bjornn","done","done"],
+  ["Jaden","Blacker","none","none"],
+  ["Jenna","Blacker","done","none"],
+  ["Kyle","Boblett","done","none"],
+  ["Tanner","Bodily","none","none"],
+  ["Persephone","Bohon","done","done"],
+  ["Michael","Bradshaw","none","none"],
+  ["Fidel","Bravo","done","none"],
+  ["Hunter","Breshears","none","none"],
+  ["Benjamin","Briten","none","none"],
+  ["Candice","Brizuela","none","none"],
+  ["Adam","Broud","none","none"],
+  ["Lindsey","Broud","done","none"],
+  ["Marisa","Bruce","done","none"],
+  ["Jon","Brusch","pending","pending"],
+  ["Katelyn","Call","none","none"],
+  ["Lizbeth","Calvillo","pending","pending"],
+  ["Veronica","Campos","none","none"],
+  ["Gabriel","Cano","done","done"],
+  ["Yadira","Castillo","none","none"],
+  ["Amelia","Chacon","done","none"],
+  ["Lexus","Chavez","done","done"],
+  ["Lilianah","Chavez","done","none"],
+  ["Easton","Christiansen","none","none"],
+  ["Austin","Chugg","none","none"],
+  ["Cameron","Clark","done","done"],
+  ["Lautaro","Colazo","done","none"],
+  ["Jeremy","Conterio","done","done"],
+  ["Kylen","Conterio","done","none"],
+  ["David","Cook","done","none"],
+  ["Chip","Cook","none","none"],
+  ["Matt","Cook","none","none"],
+  ["Zander","Cook","none","none"],
+  ["Dominique","Coon","done","done"],
+  ["Frank","Corbett","none","none"],
+  ["Samuel","Corbett","pending","pending"],
+  ["Joshua","Cruz","none","none"],
+  ["Ian","Cuillard","none","none"],
+  ["Bradie","Dains","done","done"],
+  ["Katherine","Davidson","pending","none"],
+  ["Brennen","Davis","done","done"],
+  ["Evan","Davis","none","none"],
+  ["Malia","Davis","none","none"],
+  ["Edin","Dzindo","done","done"],
+  ["Trevor","Durfey","none","none"],
+  ["William","Edwards","none","none"],
+  ["Nicholis","Egbert","done","done"],
+  ["Davis","England","none","none"],
+  ["Houston","Ewing","none","none"],
+  ["Carli","Fairchild","done","done"],
+  ["Paytan","Fairchild","done","done"],
+  ["Jasmin","Fedaie","none","none"],
+  ["Joshua","Ferry","none","none"],
+  ["Nicholas","Filetti","none","none"],
+  ["Kyle","Fowers","none","none"],
+  ["Saran","Garcia","none","none"],
+  ["Jacob","Garner","done","done"],
+  ["Brian","Garstka","done","none"],
+  ["Avery","Giles","done","done"],
+  ["Alexis","Gilliam","done","done"],
+  ["Bentley","Glover","done","done"],
+  ["Trevor","Gosar","done","done"],
+  ["Rebecca","Graham","none","none"],
+  ["Laci","Greene","none","none"],
+  ["Colton","Griffith","done","done"],
+  ["Natassja","Grossman","done","none"],
+  ["Matteo","Guerrieri","done","done"],
+  ["Leigha","Gutierrez","none","none"],
+  ["Vanessa","Gutierrez","none","none"],
+  ["Taylour","Hanson","done","none"],
+  ["Dallin","Hatch","none","none"],
+  ["Jonathan","Hernandez","done","none"],
+  ["Carson","Hoch","done","done"],
+  ["Rylie","Hockenbury","none","none"],
+  ["Ryan","Horton","none","none"],
+  ["Andy","Huerta","none","none"],
+  ["Diego","Ibarra","none","none"],
+  ["Parker","Jackson","none","none"],
+  ["Samuel","Jaggi","none","none"],
+  ["Cory","Jeffs","done","done"],
+  ["Andrew","Jensen","done","done"],
+  ["Kayla","Jensen","pending","pending"],
+  ["Nathan","Jensen","none","none"],
+  ["Garret","Joiret","done","done"],
+  ["Olivia","Jones","pending","done"],
+  ["Arlette","Juarez","done","none"],
+  ["Cesar","Juarez","done","done"],
+  ["Felisha","Juarez","none","none"],
+  ["Isela","Juarez","done","done"],
+  ["Raquel","Juarez","done","done"],
+  ["Yesenia","Juarez","done","done"],
+  ["Yvette","Juarez","none","none"],
+  ["Sara","Kapsimalis","none","none"],
+  ["Ryan","Kesler","none","none"],
+  ["Mobina","Khazei","none","none"],
+  ["Creighton","King","done","pending"],
+  ["Nathaniel","Kirk","pending","none"],
+  ["Jordan","Knudsen","pending","pending"],
+  ["Hanna","Kolsen","done","none"],
+  ["Aidan","Kuhlman","pending","pending"],
+  ["Joshua","Kuhn","none","none"],
+  ["Noah","Kumrow","done","done"],
+  ["Harrison","Larsen","done","done"],
+  ["Owen","Larson","done","done"],
+  ["Kira","Laub","none","none"],
+  ["Nathaniel","Leishman","done","pending"],
+  ["Devin","Lethbridge","none","none"],
+  ["Brady","Lewis","none","none"],
+  ["Caleb","Loveland","none","none"],
+  ["Christian","Luiten","done","none"],
+  ["Ryan","Madsen","none","none"],
+  ["Matthew","Mahony","pending","pending"],
+  ["Aliya","Maldonado","none","none"],
+  ["Dixie","Mann","done","done"],
+  ["Zachary","Martin","none","none"],
+  ["Jonathan","Martinez","done","none"],
+  ["Julissa","Martinez","done","done"],
+  ["Katelyn","Mayner","none","none"],
+  ["Kiera","Mcguire","none","none"],
+  ["Misty","McKenzie","done","done"],
+  ["Preston","McPheters","done","done"],
+  ["RoAnne","Mediati","none","none"],
+  ["Jacob","Meiners","none","none"],
+  ["Vanessa","Mercado","done","done"],
+  ["Schylar","Mills","done","done"],
+  ["Kevin","Millward","done","none"],
+  ["Jera","Mitchell","none","none"],
+  ["London","Mitchell","done","none"],
+  ["Kendra","Molina-Lacy","none","none"],
+  ["Destiny","Nelson","pending","none"],
+  ["Bryce","Nicoll","none","none"],
+  ["Christian","Nielsen","none","none"],
+  ["Dustin","Nielsen","done","none"],
+  ["Kambren","Nielson","done","done"],
+  ["Uela","Nifo","none","none"],
+  ["Michael","O'Brien","pending","pending"],
+  ["Jacoby","O'Connell","done","done"],
+  ["Esau","Ocrospoma","none","none"],
+  ["Guadalupe","Ornelas","done","done"],
+  ["Kearra","Orth","none","none"],
+  ["Trevor","Patten","none","none"],
+  ["Zavian","Pelayo","pending","pending"],
+  ["Emily","Pena-Gil","done","none"],
+  ["Bradley","Perkins","done","done"],
+  ["Kevin","Perkins","done","done"],
+  ["John","Petitta","none","none"],
+  ["Chase","Pickett","none","none"],
+  ["Ashley","Pliler","done","none"],
+  ["Alishia","Proctor","done","done"],
+  ["Joshua","Putnam","done","done"],
+  ["Angelica","Quezada","none","none"],
+  ["Christine","Rallison","done","done"],
+  ["Randy","Ramirez","none","none"],
+  ["Yesenia","Ramirez","done","none"],
+  ["Emily","Rasmussen","done","pending"],
+  ["Gary","Rasmussen","none","none"],
+  ["Haleigh","Rasmussen","done","done"],
+  ["Sadie","Rasmussen","none","none"],
+  ["Jaunette","Reyes","done","done"],
+  ["Owen","Reynolds","none","none"],
+  ["Kelsie","Richardson","done","done"],
+  ["Rosio","Rivera","done","done"],
+  ["Franklin","Rizo","none","none"],
+  ["Zach","Roberts","none","none"],
+  ["Joseph","Rose","done","done"],
+  ["Kathryn","Sabersky","none","none"],
+  ["Melissa","Salinas","done","none"],
+  ["Eduardo","Sanchez","none","done"],
+  ["Sara","Schafer","done","none"],
+  ["Zackery","Schrenk","none","none"],
+  ["Gregory","Secrist","none","none"],
+  ["Brayden","Shoemaker","none","none"],
+  ["Tanner","Sillito","done","done"],
+  ["Pablo","Silvaz","none","none"],
+  ["Caleb","Smith","none","none"],
+  ["Ryan","Smith","none","none"],
+  ["Teague","Smyer","none","none"],
+  ["Nicholas","Snelson","done","none"],
+  ["Matthew","Sommercorn","done","done"],
+  ["Daniel","Spencer","none","none"],
+  ["Jade","Spencer","done","done"],
+  ["Malibu","Sprinkle","none","none"],
+  ["Mark","Stahmann","none","none"],
+  ["Haylee","Stalions","none","none"],
+  ["Kjell","Stamminger","none","none"],
+  ["Jill","Stellingwerf","done","none"],
+  ["Brynne","Stenovich","done","none"],
+  ["Evan","Stone","done","pending"],
+  ["Sterling","Strickland","none","none"],
+  ["James","Takacs","none","none"],
+  ["Trinidad","Talamantes","none","none"],
+  ["Landon","Talbot","none","none"],
+  ["Jack","Tanis","done","done"],
+  ["Jacob","Telles","none","none"],
+  ["David","Ten","none","none"],
+  ["Mercedes","Tena","none","none"],
+  ["Dorothy","Thaxton","none","none"],
+  ["Amanda","Tilley","done","none"],
+  ["Ashley","Tilley","none","none"],
+  ["Rayce","Tohara","pending","pending"],
+  ["Rylee","Tomicic","done","none"],
+  ["Jeremy","Toner","none","none"],
+  ["Teeghan","Turner","none","none"],
+  ["Nina","Twitchell","none","none"],
+  ["Erick","Vega","pending","none"],
+  ["Julie","Vosdoganis","none","none"],
+  ["Dalton","Wallace","done","done"],
+  ["Gavin","Welch","none","none"],
+  ["Kyle","Whitchurch","done","done"],
+  ["Audrey","Williams","none","none"],
+  ["Brandon","Williams","none","none"],
+  ["Corbin","Williams","done","done"],
+  ["David","Williams","done","none"],
+  ["Jesse","Williams","none","pending"],
+  ["Jessica","Wilson","done","done"],
+  ["Ashley","Wimmer","none","none"],
+  ["James","Wirthlin","none","none"],
+  ["Craig","Wright","done","done"],
+  ["Chase","Zundel","done","none"],
+];
+
+let currentFilter = 'all';
+
+function overallStatus(s, b) {
+  if (s === 'done' && b === 'done') return 'both';
+  if (s === 'none' && b === 'none') return 'none';
+  return 'partial';
+}
+
+function badgeHtml(status, label) {
+  if (status === 'done') return `<span class="badge-done">✅ Signed</span>`;
+  if (status === 'pending') return `<span class="badge-pending">⚠️ Verify Email</span>`;
+  return `<span class="badge-none">❌ Not Signed</span>`;
+}
+
+function overallIcon(s, b) {
+  const o = overallStatus(s, b);
+  if (o === 'both') return `<span class="overall-done">✅</span>`;
+  if (o === 'partial') return `<span class="overall-partial">⚠️</span>`;
+  return `<span class="overall-none">❌</span>`;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  render(document.getElementById('search').value);
+}
+
+function render(q) {
+  const query = q.trim().toLowerCase();
+  let filtered = PEOPLE.filter(([first, last]) =>
+    !query || first.toLowerCase().includes(query) || last.toLowerCase().includes(query) ||
+    `${first} ${last}`.toLowerCase().includes(query)
+  );
+
+  if (currentFilter === 'both') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'both');
+  if (currentFilter === 'partial') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'partial');
+  if (currentFilter === 'none') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'none');
+
+  const tbody = document.getElementById('tableBody');
+  const noResults = document.getElementById('noResults');
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    noResults.style.display = 'block';
+    document.getElementById('resultCount').textContent = '';
+    return;
+  }
+
+  noResults.style.display = 'none';
+  document.getElementById('resultCount').textContent = query || currentFilter !== 'all'
+    ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
+    : `${PEOPLE.length} people total`;
+
+  filtered.forEach(([first, last, snow, buck]) => {
+    const name = `${first} ${last}`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="name-cell">${highlight(name, q.trim())}</td>
+      <td>${badgeHtml(snow)}</td>
+      <td>${badgeHtml(buck)}</td>
+      <td>${overallIcon(snow, buck)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateStats() {
+  const total = PEOPLE.length;
+  const both = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'both').length;
+  const partial = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'partial').length;
+  const none = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'none').length;
+  document.getElementById('statAll').textContent = total;
+  document.getElementById('statBoth').textContent = both;
+  document.getElementById('statPartial').textContent = partial;
+  document.getElementById('statNone').textContent = none;
+}
+
+const searchInput = document.getElementById('search');
+const clearBtn = document.getElementById('clearBtn');
+
+searchInput.addEventListener('input', () => {
+  clearBtn.style.display = searchInput.value ? 'block' : 'none';
+  render(searchInput.value);
+});
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  clearBtn.style.display = 'none';
+  searchInput.focus();
+  render('');
+});
+
+// Init
+document.querySelector('.stat-chip.all').classList.add('active');
+updateStats();
+render('');
+</script>
+</body>
+</html>
