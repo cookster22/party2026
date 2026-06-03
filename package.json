@@ -1,0 +1,12 @@
+{
+  "name": "party-2026",
+  "version": "1.0.0",
+  "description": "Lease End Party 2026 — Hotel & Shuttle lookup",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

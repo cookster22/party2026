@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lease End Party 2026 — Hotel & Shuttle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a120b;
+      color: #f5ece0;
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #2c1a0e 0%, #3d2410 50%, #2c1a0e 100%);
+      border-bottom: 3px solid #b8860b;
+      padding: 36px 24px 32px;
+      text-align: center;
+    }
+
+    .hero-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+
+    .hero h1 {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 700;
+      color: #f5d080;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .hero .subtitle {
+      font-size: 1rem;
+      color: #c9a96e;
+      margin-bottom: 20px;
+    }
+
+    .details-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .detail-chip {
+      background: rgba(184,134,11,0.15);
+      border: 1px solid rgba(184,134,11,0.4);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      color: #f5d080;
+    }
+
+    .detail-chip strong { color: #ffeaa0; }
+
+    .waiver-box {
+      background: rgba(180,60,30,0.2);
+      border: 1px solid rgba(220,100,60,0.4);
+      border-radius: 10px;
+      padding: 14px 20px;
+      max-width: 560px;
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    .waiver-box .waiver-title {
+      font-weight: 700;
+      color: #f5a070;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .waiver-box a {
+      display: block;
+      color: #87ceeb;
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 2px 0;
+    }
+
+    .waiver-box a:hover { text-decoration: underline; }
+
+    .hotel-box {
+      background: rgba(184,134,11,0.1);
+      border: 1px solid rgba(184,134,11,0.3);
+      border-radius: 10px;
+      padding: 14px 20px;
+      max-width: 560px;
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    .hotel-box .hotel-title {
+      font-weight: 700;
+      color: #f5d080;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .hotel-box .hotel-item {
+      font-size: 0.88rem;
+      color: #d4b896;
+      margin-bottom: 4px;
+    }
+
+    .shuttle-note {
+      background: rgba(60,120,60,0.15);
+      border: 1px solid rgba(80,160,80,0.3);
+      border-radius: 10px;
+      padding: 12px 20px;
+      max-width: 560px;
+      margin: 0 auto;
+      font-size: 0.88rem;
+      color: #a8d8a8;
+      text-align: left;
+    }
+
+    .dm-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: #9a8070;
+    }
+
+    .search-section {
+      padding: 28px 16px 12px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .search-section label {
+      display: block;
+      font-size: 0.85rem;
+      color: #a89070;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 14px 48px 14px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 2px solid #4a3020;
+      background: #2a1a0e;
+      color: #f5ece0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus { border-color: #b8860b; }
+    .search-wrap input::placeholder { color: #6a5040; }
+
+    .search-wrap .clear-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6a5040;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .table-section {
+      padding: 8px 16px 48px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .result-count {
+      font-size: 0.82rem;
+      color: #7a6050;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #9a8060;
+      padding: 8px 12px;
+      border-bottom: 1px solid #3a2a1a;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #2a1e14;
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: rgba(184,134,11,0.07); }
+
+    tbody td {
+      padding: 11px 12px;
+      font-size: 0.92rem;
+      vertical-align: middle;
+    }
+
+    .name-cell { font-weight: 600; color: #f5ece0; }
+
+    .hotel-courtyard { color: #87ceeb; }
+    .hotel-hilton { color: #c3a5e8; }
+    .hotel-none { color: #6a5a4a; font-style: italic; }
+
+    .shuttle-yes {
+      display: inline-block;
+      background: rgba(60,160,60,0.2);
+      border: 1px solid rgba(80,180,80,0.4);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.82rem;
+      color: #90ee90;
+    }
+
+    .shuttle-no {
+      display: inline-block;
+      background: rgba(100,80,60,0.2);
+      border: 1px solid rgba(120,100,70,0.3);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.82rem;
+      color: #9a8060;
+    }
+
+    .shuttle-unknown {
+      display: inline-block;
+      background: rgba(180,60,30,0.15);
+      border: 1px solid rgba(200,80,50,0.35);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.82rem;
+      color: #e08060;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6a5040;
+      font-style: italic;
+    }
+
+    mark {
+      background: rgba(184,134,11,0.35);
+      color: inherit;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 480px) {
+      thead th:nth-child(2) { display: none; }
+      tbody td:nth-child(2) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="hero-emoji">🤠</span>
+  <h1>Lease End Party 2026</h1>
+  <p class="subtitle">Hotel &amp; Shuttle Assignments</p>
+
+  <div class="details-grid">
+    <div class="detail-chip"><strong>When:</strong> Saturday, June 6 &nbsp;·&nbsp; 7–10 PM</div>
+    <div class="detail-chip"><strong>Where:</strong> Snowbasin Resort</div>
+    <div class="detail-chip"><strong>Attire:</strong> Western / Ranch wear 🤠</div>
+  </div>
+
+  <div class="waiver-box">
+    <div class="waiver-title">⚠️ Sign both waivers before Saturday — plus-ones too</div>
+    <a href="https://waiver.smartwaiver.com/w/n1qncqjkdme8eu3xud26h/web/" target="_blank" rel="noopener">→ Snowbasin Waiver</a>
+    <a href="https://waiver.smartwaiver.com/w/hdbohnp4evpbp3y1unsdp7/web/" target="_blank" rel="noopener">→ Buck Wild (electric bull) Waiver</a>
+  </div>
+
+  <div class="hotel-box">
+    <div class="hotel-title">🏨 Hotels — room is covered; bring a card for incidentals</div>
+    <div class="hotel-item"><strong style="color:#87ceeb">Courtyard Marriott Ogden</strong> — 247 24th Street, Ogden, UT 84401</div>
+    <div class="hotel-item"><strong style="color:#c3a5e8">Hilton Garden Inn Ogden</strong> — 2271 S Washington Blvd, Ogden, UT 84401</div>
+  </div>
+
+  <div class="shuttle-note">
+    🚌 <strong>Shuttle:</strong> If your row says <strong>Yes</strong>, buses stage no later than <strong>6:15 PM</strong> and depart no later than <strong>6:30 PM</strong> from your hotel. Miss it and you're driving.
+  </div>
+
+  <p class="dm-note">If anything looks wrong — DM Chip and he'll fix it.</p>
+</div>
+
+<div class="search-section">
+  <label for="search">Find your name (alphabetical by last name)</label>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search by first or last name…" autocomplete="off" />
+    <button class="clear-btn" id="clearBtn" title="Clear">✕</button>
+  </div>
+</div>
+
+<div class="table-section">
+  <div class="result-count" id="resultCount"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Last Name</th>
+        <th>Hotel</th>
+        <th>Shuttle</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none">No one found — try a different spelling.</div>
+</div>
+
+<script>
+const PEOPLE = [
+  ["Gianfranco","Aciego","Hilton Garden Inn Ogden","Yes"],
+  ["Ethan","Aguinaga","Courtyard Marriott Ogden","Yes"],
+  ["Jaime","Alamillo","Courtyard Marriott Ogden","Yes"],
+  ["Aaron","Albrechtsen","Courtyard Marriott Ogden","Yes"],
+  ["Burke","Alder","Hilton Garden Inn Ogden","No"],
+  ["Easton","Anderson","Hilton Garden Inn Ogden","Yes"],
+  ["Julie","Anderson","Hilton Garden Inn Ogden","Yes"],
+  ["Rhett","Anderson","Hilton Garden Inn Ogden","—"],
+  ["Dallas","Andrade","Courtyard Marriott Ogden","Yes"],
+  ["Brenda","Arambula","Hilton Garden Inn Ogden","No"],
+  ["Carlee","Arthur","Courtyard Marriott Ogden","Yes"],
+  ["Zach","Baker","Not staying overnight","No"],
+  ["Austin","Bakker","Not staying overnight","No"],
+  ["Shane","Ball","Courtyard Marriott Ogden","No"],
+  ["Dustin","Barrilleaux","Not staying overnight","No"],
+  ["Nermin","Bektic","Courtyard Marriott Ogden","Yes"],
+  ["Madeline","Birtcher","Courtyard Marriott Ogden","Yes"],
+  ["Daniel","Bjornn","Not staying overnight","No"],
+  ["Jaden","Blacker","Courtyard Marriott Ogden","Yes"],
+  ["Jenna","Blacker","Courtyard Marriott Ogden","Yes"],
+  ["Kyle","Boblett","Courtyard Marriott Ogden","No"],
+  ["Tanner","Bodily","Courtyard Marriott Ogden","No"],
+  ["Persephone","Bohon","Hilton Garden Inn Ogden","Yes"],
+  ["Michael","Bradshaw","Hilton Garden Inn Ogden","Yes"],
+  ["Fidel","Bravo","Hilton Garden Inn Ogden","Yes"],
+  ["Hunter","Breshears","Courtyard Marriott Ogden","No"],
+  ["Benjamin","Briten","Courtyard Marriott Ogden","Yes"],
+  ["Adam","Broud","Not staying overnight","No"],
+  ["Lindsey","Broud","Not staying overnight","No"],
+  ["Marisa","Bruce","Courtyard Marriott Ogden","Yes"],
+  ["Jon","Brusch","Hilton Garden Inn Ogden","Yes"],
+  ["Katelyn","Call","Courtyard Marriott Ogden","Yes"],
+  ["Lizbeth","Calvillo","Courtyard Marriott Ogden","Yes"],
+  ["Veronica","Campos","Courtyard Marriott Ogden","Yes"],
+  ["Gabriel","Cano","Courtyard Marriott Ogden","Yes"],
+  ["Yadira","Castillo","Courtyard Marriott Ogden","Yes"],
+  ["Amelia","Chacon","Courtyard Marriott Ogden","Yes"],
+  ["Lexus","Chavez","Courtyard Marriott Ogden","Yes"],
+  ["Lilianah","Chavez","Hilton Garden Inn Ogden","Yes"],
+  ["Easton","Christiansen","Not staying overnight","No"],
+  ["Austin","Chugg","Courtyard Marriott Ogden","No"],
+  ["Cameron","Clark","Courtyard Marriott Ogden","Yes"],
+  ["Lautaro","Colazo","Not staying overnight","No"],
+  ["Jeremy","Conterio","Courtyard Marriott Ogden","Yes"],
+  ["Kylen","Conterio","Not staying overnight","No"],
+  ["David","Cook","Courtyard Marriott Ogden","Yes"],
+  ["Forrest","Cook","Not staying overnight","No"],
+  ["Matt","Cook","Not staying overnight","No"],
+  ["Zander","Cook","Courtyard Marriott Ogden","No"],
+  ["Dominique","Coon","Courtyard Marriott Ogden","Yes"],
+  ["Frank","Corbett","Courtyard Marriott Ogden","Yes"],
+  ["Samuel","Corbett","Not staying overnight","No"],
+  ["Joshua","Cruz","Hilton Garden Inn Ogden","Yes"],
+  ["Ian","Cuillard","Courtyard Marriott Ogden","No"],
+  ["Bradie","Dains","Courtyard Marriott Ogden","Yes"],
+  ["Katherine","Davidson","Courtyard Marriott Ogden","No"],
+  ["Brennen","Davis","Not staying overnight","No"],
+  ["Evan","Davis","Not staying overnight","No"],
+  ["Malia","Davis","Courtyard Marriott Ogden","Yes"],
+  ["Edin","Dzindo","Courtyard Marriott Ogden","Yes"],
+  ["William","Edwards","Courtyard Marriott Ogden","No"],
+  ["Nicholis","Egbert","Courtyard Marriott Ogden","Yes"],
+  ["Davis","England","Not staying overnight","No"],
+  ["Houston","Ewing","Courtyard Marriott Ogden","Yes"],
+  ["Carli","Fairchild","Courtyard Marriott Ogden","No"],
+  ["Paytan","Fairchild","Not staying overnight","No"],
+  ["Jasmin","Fedaie","Courtyard Marriott Ogden","Yes"],
+  ["Joshua","Ferry","Courtyard Marriott Ogden","Yes"],
+  ["Nicholas","Filetti","Courtyard Marriott Ogden","No"],
+  ["Kyle","Fowers","Hilton Garden Inn Ogden","Yes"],
+  ["Saran","Garcia","Courtyard Marriott Ogden","No"],
+  ["Jacob","Garner","Courtyard Marriott Ogden","No"],
+  ["Brian","Garstka","Not staying overnight","No"],
+  ["Avery","Giles","Courtyard Marriott Ogden","Yes"],
+  ["Alexis","Gilliam","Courtyard Marriott Ogden","Yes"],
+  ["Bentley","Glover","Courtyard Marriott Ogden","No"],
+  ["Trevor","Gosar","Courtyard Marriott Ogden","No"],
+  ["Rebecca","Graham","Hilton Garden Inn Ogden","Yes"],
+  ["Laci","Greene","Hilton Garden Inn Ogden","Yes"],
+  ["Colton","Griffith","Courtyard Marriott Ogden","Yes"],
+  ["Natassja","Grossman","Courtyard Marriott Ogden","No"],
+  ["Matteo","Guerrieri","Courtyard Marriott Ogden","Yes"],
+  ["Leigha","Gutierrez","Courtyard Marriott Ogden","Yes"],
+  ["Vanessa","Gutierrez","Courtyard Marriott Ogden","Yes"],
+  ["Taylour","Hanson","Courtyard Marriott Ogden","No"],
+  ["Dallin","Hatch","Not staying overnight","No"],
+  ["Jonathan","Hernandez","Courtyard Marriott Ogden","Yes"],
+  ["Carson","Hoch","Courtyard Marriott Ogden","No"],
+  ["Rylie","Hockenbury","Hilton Garden Inn Ogden","Yes"],
+  ["Ryan","Horton","Hilton Garden Inn Ogden","No"],
+  ["Andy","Huerta","Hilton Garden Inn Ogden","Yes"],
+  ["Parker","Jackson","Courtyard Marriott Ogden","No"],
+  ["Samuel","Jaggi","Courtyard Marriott Ogden","No"],
+  ["Cory","Jeffs","Courtyard Marriott Ogden","Yes"],
+  ["Andrew","Jensen","Courtyard Marriott Ogden","Yes"],
+  ["Kayla","Jensen","Courtyard Marriott Ogden","Yes"],
+  ["Nathan","Jensen","Not staying overnight","No"],
+  ["Garret","Joiret","Hilton Garden Inn Ogden","Yes"],
+  ["Olivia","Jones","Courtyard Marriott Ogden","Yes"],
+  ["Arlette","Juarez","Courtyard Marriott Ogden","Yes"],
+  ["Cesar","Juarez","Hilton Garden Inn Ogden","Yes"],
+  ["Felisha","Juarez","Courtyard Marriott Ogden","No"],
+  ["Isela","Juarez","Courtyard Marriott Ogden","Yes"],
+  ["Raquel","Juarez","Courtyard Marriott Ogden","Yes"],
+  ["Yesenia","Juarez","Courtyard Marriott Ogden","Yes"],
+  ["Yvette","Juarez","Courtyard Marriott Ogden","Yes"],
+  ["Sara","Kapsimalis","Courtyard Marriott Ogden","Yes"],
+  ["Ryan","Kesler","Courtyard Marriott Ogden","Yes"],
+  ["Mobina","Khazei","Hilton Garden Inn Ogden","No"],
+  ["Creighton","King","Courtyard Marriott Ogden","No"],
+  ["Nathaniel","Kirk","Courtyard Marriott Ogden","No"],
+  ["Jordan","Knudsen","Hilton Garden Inn Ogden","Yes"],
+  ["Hanna","Kolsen","Courtyard Marriott Ogden","Yes"],
+  ["Aidan","Kuhlman","Courtyard Marriott Ogden","Yes"],
+  ["Joshua","Kuhn","Not staying overnight","No"],
+  ["Harrison","Larsen","Courtyard Marriott Ogden","No"],
+  ["Owen","Larson","Courtyard Marriott Ogden","No"],
+  ["Kira","Laub","Courtyard Marriott Ogden","Yes"],
+  ["Nathaniel","Leishman","Not staying overnight","No"],
+  ["Devin","Lethbridge","Courtyard Marriott Ogden","Yes"],
+  ["Brady","Lewis","Courtyard Marriott Ogden","No"],
+  ["Caleb","Loveland","Not staying overnight","Yes"],
+  ["Christian","Luiten","Courtyard Marriott Ogden","No"],
+  ["Ryan","Madsen","Not staying overnight","No"],
+  ["Matthew","Mahony","Courtyard Marriott Ogden","Yes"],
+  ["Aliya","Maldonado","Courtyard Marriott Ogden","Yes"],
+  ["Dixie","Mann","Courtyard Marriott Ogden","Yes"],
+  ["Zachary","Martin","Courtyard Marriott Ogden","No"],
+  ["Jonathan","Martinez","Hilton Garden Inn Ogden","No"],
+  ["Julissa","Martinez","Courtyard Marriott Ogden","Yes"],
+  ["Katelyn","Mayner","Hilton Garden Inn Ogden","Yes"],
+  ["Kiera","Mcguire","Courtyard Marriott Ogden","No"],
+  ["Misty","McKenzie","Courtyard Marriott Ogden","Yes"],
+  ["Preston","McPheters","Courtyard Marriott Ogden","No"],
+  ["RoAnne","Mediati","Hilton Garden Inn Ogden","Yes"],
+  ["Jacob","Meiners","Courtyard Marriott Ogden","Yes"],
+  ["Vanessa","Mercado","Courtyard Marriott Ogden","Yes"],
+  ["Schylar","Mills","Courtyard Marriott Ogden","Yes"],
+  ["Kevin","Millward","Courtyard Marriott Ogden","No"],
+  ["Jera","Mitchell","Courtyard Marriott Ogden","Yes"],
+  ["London","Mitchell","Courtyard Marriott Ogden","No"],
+  ["Kendra","Molina-Lacy","Courtyard Marriott Ogden","Yes"],
+  ["Destiny","Nelson","Courtyard Marriott Ogden","Yes"],
+  ["Bryce","Nicoll","Courtyard Marriott Ogden","No"],
+  ["Christian","Nielsen","Courtyard Marriott Ogden","Yes"],
+  ["Dustin","Nielsen","Courtyard Marriott Ogden","Yes"],
+  ["Kambren","Nielson","Hilton Garden Inn Ogden","No"],
+  ["Uela","Nifo","Courtyard Marriott Ogden","No"],
+  ["Michael","O'Brien","Hilton Garden Inn Ogden","Yes"],
+  ["Jacoby","O'Connell","Courtyard Marriott Ogden","Yes"],
+  ["Esau","Ocrospoma","Not staying overnight","—"],
+  ["Guadalupe","Ornelas","Courtyard Marriott Ogden","Yes"],
+  ["Kearra","Orth","Courtyard Marriott Ogden","Yes"],
+  ["Trevor","Patten","Courtyard Marriott Ogden","No"],
+  ["Zavian","Pelayo","Courtyard Marriott Ogden","No"],
+  ["Emily","Pena-Gil","Courtyard Marriott Ogden","Yes"],
+  ["Bradley","Perkins","Courtyard Marriott Ogden","No"],
+  ["Kevin","Perkins","Courtyard Marriott Ogden","Yes"],
+  ["John","Petitta","Courtyard Marriott Ogden","No"],
+  ["Chase","Pickett","Courtyard Marriott Ogden","Yes"],
+  ["Ashley","Pliler","Courtyard Marriott Ogden","No"],
+  ["Alishia","Proctor","Courtyard Marriott Ogden","No"],
+  ["Joshua","Putnam","Courtyard Marriott Ogden","Yes"],
+  ["Angelica","Quezada","Hilton Garden Inn Ogden","Yes"],
+  ["Christine","Rallison","Courtyard Marriott Ogden","Yes"],
+  ["Randy","Ramirez","Courtyard Marriott Ogden","Yes"],
+  ["Yesenia","Ramirez","Courtyard Marriott Ogden","Yes"],
+  ["Emily","Rasmussen","Hilton Garden Inn Ogden","Yes"],
+  ["Gary","Rasmussen","Courtyard Marriott Ogden","No"],
+  ["Haleigh","Rasmussen","Hilton Garden Inn Ogden","No"],
+  ["Sadie","Rasmussen","Courtyard Marriott Ogden","No"],
+  ["Jaunette","Reyes","Hilton Garden Inn Ogden","Yes"],
+  ["Owen","Reynolds","Hilton Garden Inn Ogden","Yes"],
+  ["Kelsie","Richardson","Courtyard Marriott Ogden","No"],
+  ["Rosio","Rivera","Courtyard Marriott Ogden","Yes"],
+  ["Franklin","Rizo","Courtyard Marriott Ogden","Yes"],
+  ["Zach","Roberts","Hilton Garden Inn Ogden","Yes"],
+  ["Joseph","Rose","Courtyard Marriott Ogden","—"],
+  ["Kathryn","Sabersky","Courtyard Marriott Ogden","Yes"],
+  ["Melissa","Salinas","Courtyard Marriott Ogden","Yes"],
+  ["Eduardo","Sanchez","Courtyard Marriott Ogden","Yes"],
+  ["Sara","Schafer","Hilton Garden Inn Ogden","No"],
+  ["Zackery","Schrenk","Hilton Garden Inn Ogden","No"],
+  ["Gregory","Secrist","Hilton Garden Inn Ogden","Yes"],
+  ["Brayden","Shoemaker","Not staying overnight","No"],
+  ["Tanner","Sillito","Courtyard Marriott Ogden","No"],
+  ["Pablo","Silvaz","Hilton Garden Inn Ogden","No"],
+  ["Caleb","Smith","Courtyard Marriott Ogden","No"],
+  ["Ryan","Smith","Hilton Garden Inn Ogden","No"],
+  ["Teague","Smyer","Courtyard Marriott Ogden","No"],
+  ["Nicholas","Snelson","Not staying overnight","No"],
+  ["Matthew","Sommercorn","Courtyard Marriott Ogden","No"],
+  ["Daniel","Spencer","Courtyard Marriott Ogden","Yes"],
+  ["Jade","Spencer","Courtyard Marriott Ogden","Yes"],
+  ["Malibu","Sprinkle","Courtyard Marriott Ogden","Yes"],
+  ["Mark","Stahmann","Not staying overnight","No"],
+  ["Haylee","Stalions","Courtyard Marriott Ogden","Yes"],
+  ["Kjell","Stamminger","Not staying overnight","No"],
+  ["Jill","Stellingwerf","Courtyard Marriott Ogden","Yes"],
+  ["Brynne","Stenovich","Hilton Garden Inn Ogden","Yes"],
+  ["Evan","Stone","Hilton Garden Inn Ogden","No"],
+  ["Sterling","Strickland","Courtyard Marriott Ogden","Yes"],
+  ["James","Takacs","Not staying overnight","No"],
+  ["Trinidad","Talamantes","Hilton Garden Inn Ogden","Yes"],
+  ["Landon","Talbot","Not staying overnight","No"],
+  ["Jack","Tanis","Courtyard Marriott Ogden","Yes"],
+  ["Jacob","Telles","Hilton Garden Inn Ogden","No"],
+  ["David","Ten","Not staying overnight","No"],
+  ["Mercedes","Tena","Hilton Garden Inn Ogden","Yes"],
+  ["Dorothy","Thaxton","Courtyard Marriott Ogden","Yes"],
+  ["Amanda","Tilley","Courtyard Marriott Ogden","Yes"],
+  ["Ashley","Tilley","Courtyard Marriott Ogden","No"],
+  ["Rayce","Tohara","Hilton Garden Inn Ogden","Yes"],
+  ["Rylee","Tomicic","Courtyard Marriott Ogden","No"],
+  ["Jeremy","Toner","Not staying overnight","No"],
+  ["Teeghan","Turner","Courtyard Marriott Ogden","No"],
+  ["Nina","Twitchell","Courtyard Marriott Ogden","Yes"],
+  ["Erick","Vega","Not staying overnight","No"],
+  ["Julie","Vosdoganis","Courtyard Marriott Ogden","Yes"],
+  ["Dalton","Wallace","Courtyard Marriott Ogden","No"],
+  ["Gavin","Welch","Not staying overnight","No"],
+  ["Kyle","Whitchurch","Courtyard Marriott Ogden","No"],
+  ["Audrey","Williams","Not staying overnight","No"],
+  ["Brandon","Williams","Not staying overnight","No"],
+  ["Corbin","Williams","Not staying overnight","No"],
+  ["David","Williams","Not staying overnight","No"],
+  ["Jesse","Williams","Courtyard Marriott Ogden","No"],
+  ["Jessica","Wilson","Not staying overnight","No"],
+  ["Ashley","Wimmer","Courtyard Marriott Ogden","Yes"],
+  ["James","Wirthlin","Courtyard Marriott Ogden","No"],
+  ["Craig","Wright","Not staying overnight","Yes"],
+  ["Chase","Zundel","Courtyard Marriott Ogden","No"],
+];
+
+const tbody = document.getElementById('tableBody');
+const searchInput = document.getElementById('search');
+const clearBtn = document.getElementById('clearBtn');
+const resultCount = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+
+function hotelClass(hotel) {
+  if (hotel.includes('Courtyard')) return 'hotel-courtyard';
+  if (hotel.includes('Hilton')) return 'hotel-hilton';
+  return 'hotel-none';
+}
+
+function hotelLabel(hotel) {
+  if (hotel.includes('Courtyard')) return 'Courtyard Marriott';
+  if (hotel.includes('Hilton')) return 'Hilton Garden Inn';
+  return hotel;
+}
+
+function shuttleTag(s) {
+  if (s === 'Yes') return `<span class="shuttle-yes">Yes</span>`;
+  if (s === 'No') return `<span class="shuttle-no">No</span>`;
+  return `<span class="shuttle-unknown">TBD — DM Chip</span>`;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function render(q) {
+  const query = q.trim().toLowerCase();
+  const filtered = PEOPLE.filter(([first, last]) =>
+    !query ||
+    first.toLowerCase().includes(query) ||
+    last.toLowerCase().includes(query) ||
+    `${first} ${last}`.toLowerCase().includes(query)
+  );
+
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    noResults.style.display = 'block';
+    resultCount.textContent = '';
+    return;
+  }
+
+  noResults.style.display = 'none';
+  resultCount.textContent = query
+    ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
+    : `${PEOPLE.length} people total`;
+
+  filtered.forEach(([first, last, hotel, shuttle]) => {
+    const fullName = `${first} ${last}`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="name-cell">${highlight(fullName, q.trim())}</td>
+      <td style="color:#7a6050;font-size:0.82rem">${highlight(last, q.trim())}</td>
+      <td class="${hotelClass(hotel)}">${hotelLabel(hotel)}</td>
+      <td>${shuttleTag(shuttle)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+searchInput.addEventListener('input', () => {
+  const v = searchInput.value;
+  clearBtn.style.display = v ? 'block' : 'none';
+  render(v);
+});
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  clearBtn.style.display = 'none';
+  searchInput.focus();
+  render('');
+});
+
+render('');
+</script>
+</body>
+</html>
