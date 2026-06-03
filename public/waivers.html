@@ -287,312 +287,297 @@
 </div>
 
 <script>
-// [first, last, snowbasin_status, buckwild_status]
-// status: 'done' | 'pending' | 'none'
-const PEOPLE = [
-  ["Gianfranco","Aciego","none","none"],
-  ["Ethan","Aguinaga","none","none"],
-  ["Jaime","Alamillo","done","done"],
-  ["Aaron","Albrechtsen","none","none"],
-  ["Burke","Alder","none","none"],
-  ["Easton","Anderson","done","none"],
-  ["Julie","Anderson","done","none"],
-  ["Rhett","Anderson","none","none"],
-  ["Dallas","Andrade","none","none"],
-  ["Brenda","Arambula","none","none"],
-  ["Carlee","Arthur","done","none"],
-  ["Zach","Baker","done","none"],
-  ["Austin","Bakker","done","done"],
-  ["Shane","Ball","none","none"],
-  ["Dustin","Barrilleaux","done","done"],
-  ["Nermin","Bektic","done","done"],
-  ["Madeline","Birtcher","done","done"],
-  ["Daniel","Bjornn","done","done"],
-  ["Jaden","Blacker","none","none"],
-  ["Jenna","Blacker","done","none"],
-  ["Kyle","Boblett","done","none"],
-  ["Tanner","Bodily","none","none"],
-  ["Persephone","Bohon","done","done"],
-  ["Michael","Bradshaw","none","none"],
-  ["Fidel","Bravo","done","none"],
-  ["Hunter","Breshears","none","none"],
-  ["Benjamin","Briten","none","none"],
-  ["Candice","Brizuela","none","none"],
-  ["Adam","Broud","none","none"],
-  ["Lindsey","Broud","done","none"],
-  ["Marisa","Bruce","done","none"],
-  ["Jon","Brusch","pending","pending"],
-  ["Katelyn","Call","none","none"],
-  ["Lizbeth","Calvillo","pending","pending"],
-  ["Veronica","Campos","none","none"],
-  ["Gabriel","Cano","done","done"],
-  ["Yadira","Castillo","none","none"],
-  ["Amelia","Chacon","done","none"],
-  ["Lexus","Chavez","done","done"],
-  ["Lilianah","Chavez","done","none"],
-  ["Easton","Christiansen","none","none"],
-  ["Austin","Chugg","none","none"],
-  ["Cameron","Clark","done","done"],
-  ["Lautaro","Colazo","done","none"],
-  ["Jeremy","Conterio","done","done"],
-  ["Kylen","Conterio","done","none"],
-  ["David","Cook","done","none"],
-  ["Chip","Cook","none","none"],
-  ["Matt","Cook","none","none"],
-  ["Zander","Cook","none","none"],
-  ["Dominique","Coon","done","done"],
-  ["Frank","Corbett","none","none"],
-  ["Samuel","Corbett","pending","pending"],
-  ["Joshua","Cruz","none","none"],
-  ["Ian","Cuillard","none","none"],
-  ["Bradie","Dains","done","done"],
-  ["Katherine","Davidson","pending","none"],
-  ["Brennen","Davis","done","done"],
-  ["Evan","Davis","none","none"],
-  ["Malia","Davis","none","none"],
-  ["Edin","Dzindo","done","done"],
-  ["Trevor","Durfey","none","none"],
-  ["William","Edwards","none","none"],
-  ["Nicholis","Egbert","done","done"],
-  ["Davis","England","none","none"],
-  ["Houston","Ewing","none","none"],
-  ["Carli","Fairchild","done","done"],
-  ["Paytan","Fairchild","done","done"],
-  ["Jasmin","Fedaie","none","none"],
-  ["Joshua","Ferry","none","none"],
-  ["Nicholas","Filetti","none","none"],
-  ["Kyle","Fowers","none","none"],
-  ["Saran","Garcia","none","none"],
-  ["Jacob","Garner","done","done"],
-  ["Brian","Garstka","done","none"],
-  ["Avery","Giles","done","done"],
-  ["Alexis","Gilliam","done","done"],
-  ["Bentley","Glover","done","done"],
-  ["Trevor","Gosar","done","done"],
-  ["Rebecca","Graham","none","none"],
-  ["Laci","Greene","none","none"],
-  ["Colton","Griffith","done","done"],
-  ["Natassja","Grossman","done","none"],
-  ["Matteo","Guerrieri","done","done"],
-  ["Leigha","Gutierrez","none","none"],
-  ["Vanessa","Gutierrez","none","none"],
-  ["Taylour","Hanson","done","none"],
-  ["Dallin","Hatch","none","none"],
-  ["Jonathan","Hernandez","done","none"],
-  ["Carson","Hoch","done","done"],
-  ["Rylie","Hockenbury","none","none"],
-  ["Ryan","Horton","none","none"],
-  ["Andy","Huerta","none","none"],
-  ["Diego","Ibarra","none","none"],
-  ["Parker","Jackson","none","none"],
-  ["Samuel","Jaggi","none","none"],
-  ["Cory","Jeffs","done","done"],
-  ["Andrew","Jensen","done","done"],
-  ["Kayla","Jensen","pending","pending"],
-  ["Nathan","Jensen","none","none"],
-  ["Garret","Joiret","done","done"],
-  ["Olivia","Jones","pending","done"],
-  ["Arlette","Juarez","done","none"],
-  ["Cesar","Juarez","done","done"],
-  ["Felisha","Juarez","none","none"],
-  ["Isela","Juarez","done","done"],
-  ["Raquel","Juarez","done","done"],
-  ["Yesenia","Juarez","done","done"],
-  ["Yvette","Juarez","none","none"],
-  ["Sara","Kapsimalis","none","none"],
-  ["Ryan","Kesler","none","none"],
-  ["Mobina","Khazei","none","none"],
-  ["Creighton","King","done","pending"],
-  ["Nathaniel","Kirk","pending","none"],
-  ["Jordan","Knudsen","pending","pending"],
-  ["Hanna","Kolsen","done","none"],
-  ["Aidan","Kuhlman","pending","pending"],
-  ["Joshua","Kuhn","none","none"],
-  ["Noah","Kumrow","done","done"],
-  ["Harrison","Larsen","done","done"],
-  ["Owen","Larson","done","done"],
-  ["Kira","Laub","none","none"],
-  ["Nathaniel","Leishman","done","pending"],
-  ["Devin","Lethbridge","none","none"],
-  ["Brady","Lewis","none","none"],
-  ["Caleb","Loveland","none","none"],
-  ["Christian","Luiten","done","none"],
-  ["Ryan","Madsen","none","none"],
-  ["Matthew","Mahony","pending","pending"],
-  ["Aliya","Maldonado","none","none"],
-  ["Dixie","Mann","done","done"],
-  ["Zachary","Martin","none","none"],
-  ["Jonathan","Martinez","done","none"],
-  ["Julissa","Martinez","done","done"],
-  ["Katelyn","Mayner","none","none"],
-  ["Kiera","Mcguire","none","none"],
-  ["Misty","McKenzie","done","done"],
-  ["Preston","McPheters","done","done"],
-  ["RoAnne","Mediati","none","none"],
-  ["Jacob","Meiners","none","none"],
-  ["Vanessa","Mercado","done","done"],
-  ["Schylar","Mills","done","done"],
-  ["Kevin","Millward","done","none"],
-  ["Jera","Mitchell","none","none"],
-  ["London","Mitchell","done","none"],
-  ["Kendra","Molina-Lacy","none","none"],
-  ["Destiny","Nelson","pending","none"],
-  ["Bryce","Nicoll","none","none"],
-  ["Christian","Nielsen","none","none"],
-  ["Dustin","Nielsen","done","none"],
-  ["Kambren","Nielson","done","done"],
-  ["Uela","Nifo","none","none"],
-  ["Michael","O'Brien","pending","pending"],
-  ["Jacoby","O'Connell","done","done"],
-  ["Esau","Ocrospoma","none","none"],
-  ["Guadalupe","Ornelas","done","done"],
-  ["Kearra","Orth","none","none"],
-  ["Trevor","Patten","none","none"],
-  ["Zavian","Pelayo","pending","pending"],
-  ["Emily","Pena-Gil","done","none"],
-  ["Bradley","Perkins","done","done"],
-  ["Kevin","Perkins","done","done"],
-  ["John","Petitta","none","none"],
-  ["Chase","Pickett","none","none"],
-  ["Ashley","Pliler","done","none"],
-  ["Alishia","Proctor","done","done"],
-  ["Joshua","Putnam","done","done"],
-  ["Angelica","Quezada","none","none"],
-  ["Christine","Rallison","done","done"],
-  ["Randy","Ramirez","none","none"],
-  ["Yesenia","Ramirez","done","none"],
-  ["Emily","Rasmussen","done","pending"],
-  ["Gary","Rasmussen","none","none"],
-  ["Haleigh","Rasmussen","done","done"],
-  ["Sadie","Rasmussen","none","none"],
-  ["Jaunette","Reyes","done","done"],
-  ["Owen","Reynolds","none","none"],
-  ["Kelsie","Richardson","done","done"],
-  ["Rosio","Rivera","done","done"],
-  ["Franklin","Rizo","none","none"],
-  ["Zach","Roberts","none","none"],
-  ["Joseph","Rose","done","done"],
-  ["Kathryn","Sabersky","none","none"],
-  ["Melissa","Salinas","done","none"],
-  ["Eduardo","Sanchez","none","done"],
-  ["Sara","Schafer","done","none"],
-  ["Zackery","Schrenk","none","none"],
-  ["Gregory","Secrist","none","none"],
-  ["Brayden","Shoemaker","none","none"],
-  ["Tanner","Sillito","done","done"],
-  ["Pablo","Silvaz","none","none"],
-  ["Caleb","Smith","none","none"],
-  ["Ryan","Smith","none","none"],
-  ["Teague","Smyer","none","none"],
-  ["Nicholas","Snelson","done","none"],
-  ["Matthew","Sommercorn","done","done"],
-  ["Daniel","Spencer","none","none"],
-  ["Jade","Spencer","done","done"],
-  ["Malibu","Sprinkle","none","none"],
-  ["Mark","Stahmann","none","none"],
-  ["Haylee","Stalions","none","none"],
-  ["Kjell","Stamminger","none","none"],
-  ["Jill","Stellingwerf","done","none"],
-  ["Brynne","Stenovich","done","none"],
-  ["Evan","Stone","done","pending"],
-  ["Sterling","Strickland","none","none"],
-  ["James","Takacs","none","none"],
-  ["Trinidad","Talamantes","none","none"],
-  ["Landon","Talbot","none","none"],
-  ["Jack","Tanis","done","done"],
-  ["Jacob","Telles","none","none"],
-  ["David","Ten","none","none"],
-  ["Mercedes","Tena","none","none"],
-  ["Dorothy","Thaxton","none","none"],
-  ["Amanda","Tilley","done","none"],
-  ["Ashley","Tilley","none","none"],
-  ["Rayce","Tohara","pending","pending"],
-  ["Rylee","Tomicic","done","none"],
-  ["Jeremy","Toner","none","none"],
-  ["Teeghan","Turner","none","none"],
-  ["Nina","Twitchell","none","none"],
-  ["Erick","Vega","pending","none"],
-  ["Julie","Vosdoganis","none","none"],
-  ["Dalton","Wallace","done","done"],
-  ["Gavin","Welch","none","none"],
-  ["Kyle","Whitchurch","done","done"],
-  ["Audrey","Williams","none","none"],
-  ["Brandon","Williams","none","none"],
-  ["Corbin","Williams","done","done"],
-  ["David","Williams","done","none"],
-  ["Jesse","Williams","none","pending"],
-  ["Jessica","Wilson","done","done"],
-  ["Ashley","Wimmer","none","none"],
-  ["James","Wirthlin","none","none"],
-  ["Craig","Wright","done","done"],
-  ["Chase","Zundel","done","none"],
+// Party list — names only; waiver statuses fetched live from /api/waivers
+const PARTY = [
+  ["Gianfranco","Aciego"],
+  ["Ethan","Aguinaga"],
+  ["Jaime","Alamillo"],
+  ["Aaron","Albrechtsen"],
+  ["Burke","Alder"],
+  ["Easton","Anderson"],
+  ["Julie","Anderson"],
+  ["Rhett","Anderson"],
+  ["Dallas","Andrade"],
+  ["Brenda","Arambula"],
+  ["Carlee","Arthur"],
+  ["Zach","Baker"],
+  ["Austin","Bakker"],
+  ["Shane","Ball"],
+  ["Dustin","Barrilleaux"],
+  ["Nermin","Bektic"],
+  ["Madeline","Birtcher"],
+  ["Daniel","Bjornn"],
+  ["Jaden","Blacker"],
+  ["Jenna","Blacker"],
+  ["Kyle","Boblett"],
+  ["Tanner","Bodily"],
+  ["Persephone","Bohon"],
+  ["Michael","Bradshaw"],
+  ["Fidel","Bravo"],
+  ["Hunter","Breshears"],
+  ["Benjamin","Briten"],
+  ["Candice","Brizuela"],
+  ["Adam","Broud"],
+  ["Lindsey","Broud"],
+  ["Marisa","Bruce"],
+  ["Jon","Brusch"],
+  ["Katelyn","Call"],
+  ["Lizbeth","Calvillo"],
+  ["Veronica","Campos"],
+  ["Gabriel","Cano"],
+  ["Yadira","Castillo"],
+  ["Amelia","Chacon"],
+  ["Lexus","Chavez"],
+  ["Lilianah","Chavez"],
+  ["Easton","Christiansen"],
+  ["Austin","Chugg"],
+  ["Cameron","Clark"],
+  ["Lautaro","Colazo"],
+  ["Jeremy","Conterio"],
+  ["Kylen","Conterio"],
+  ["David","Cook"],
+  ["Chip","Cook"],
+  ["Matt","Cook"],
+  ["Zander","Cook"],
+  ["Dominique","Coon"],
+  ["Frank","Corbett"],
+  ["Samuel","Corbett"],
+  ["Joshua","Cruz"],
+  ["Ian","Cuillard"],
+  ["Bradie","Dains"],
+  ["Katherine","Davidson"],
+  ["Brennen","Davis"],
+  ["Evan","Davis"],
+  ["Malia","Davis"],
+  ["Edin","Dzindo"],
+  ["Trevor","Durfey"],
+  ["William","Edwards"],
+  ["Nicholis","Egbert"],
+  ["Davis","England"],
+  ["Houston","Ewing"],
+  ["Carli","Fairchild"],
+  ["Paytan","Fairchild"],
+  ["Jasmin","Fedaie"],
+  ["Joshua","Ferry"],
+  ["Nicholas","Filetti"],
+  ["Kyle","Fowers"],
+  ["Saran","Garcia"],
+  ["Jacob","Garner"],
+  ["Brian","Garstka"],
+  ["Avery","Giles"],
+  ["Alexis","Gilliam"],
+  ["Bentley","Glover"],
+  ["Trevor","Gosar"],
+  ["Rebecca","Graham"],
+  ["Laci","Greene"],
+  ["Colton","Griffith"],
+  ["Natassja","Grossman"],
+  ["Matteo","Guerrieri"],
+  ["Leigha","Gutierrez"],
+  ["Vanessa","Gutierrez"],
+  ["Taylour","Hanson"],
+  ["Dallin","Hatch"],
+  ["Jonathan","Hernandez"],
+  ["Carson","Hoch"],
+  ["Rylie","Hockenbury"],
+  ["Ryan","Horton"],
+  ["Andy","Huerta"],
+  ["Diego","Ibarra"],
+  ["Parker","Jackson"],
+  ["Samuel","Jaggi"],
+  ["Cory","Jeffs"],
+  ["Andrew","Jensen"],
+  ["Kayla","Jensen"],
+  ["Nathan","Jensen"],
+  ["Garret","Joiret"],
+  ["Olivia","Jones"],
+  ["Arlette","Juarez"],
+  ["Cesar","Juarez"],
+  ["Felisha","Juarez"],
+  ["Isela","Juarez"],
+  ["Raquel","Juarez"],
+  ["Yesenia","Juarez"],
+  ["Yvette","Juarez"],
+  ["Sara","Kapsimalis"],
+  ["Ryan","Kesler"],
+  ["Mobina","Khazei"],
+  ["Creighton","King"],
+  ["Nathaniel","Kirk"],
+  ["Jordan","Knudsen"],
+  ["Hanna","Kolsen"],
+  ["Aidan","Kuhlman"],
+  ["Joshua","Kuhn"],
+  ["Noah","Kumrow"],
+  ["Harrison","Larsen"],
+  ["Owen","Larson"],
+  ["Kira","Laub"],
+  ["Nathaniel","Leishman"],
+  ["Devin","Lethbridge"],
+  ["Brady","Lewis"],
+  ["Caleb","Loveland"],
+  ["Christian","Luiten"],
+  ["Ryan","Madsen"],
+  ["Matthew","Mahony"],
+  ["Aliya","Maldonado"],
+  ["Dixie","Mann"],
+  ["Zachary","Martin"],
+  ["Jonathan","Martinez"],
+  ["Julissa","Martinez"],
+  ["Katelyn","Mayner"],
+  ["Kiera","Mcguire"],
+  ["Misty","McKenzie"],
+  ["Preston","McPheters"],
+  ["RoAnne","Mediati"],
+  ["Jacob","Meiners"],
+  ["Vanessa","Mercado"],
+  ["Schylar","Mills"],
+  ["Kevin","Millward"],
+  ["Jera","Mitchell"],
+  ["London","Mitchell"],
+  ["Kendra","Molina-Lacy"],
+  ["Destiny","Nelson"],
+  ["Bryce","Nicoll"],
+  ["Christian","Nielsen"],
+  ["Dustin","Nielsen"],
+  ["Kambren","Nielson"],
+  ["Uela","Nifo"],
+  ["Michael","O'Brien"],
+  ["Jacoby","O'Connell"],
+  ["Esau","Ocrospoma"],
+  ["Guadalupe","Ornelas"],
+  ["Kearra","Orth"],
+  ["Trevor","Patten"],
+  ["Zavian","Pelayo"],
+  ["Emily","Pena-Gil"],
+  ["Bradley","Perkins"],
+  ["Kevin","Perkins"],
+  ["John","Petitta"],
+  ["Chase","Pickett"],
+  ["Ashley","Pliler"],
+  ["Alishia","Proctor"],
+  ["Joshua","Putnam"],
+  ["Angelica","Quezada"],
+  ["Christine","Rallison"],
+  ["Randy","Ramirez"],
+  ["Yesenia","Ramirez"],
+  ["Emily","Rasmussen"],
+  ["Gary","Rasmussen"],
+  ["Haleigh","Rasmussen"],
+  ["Sadie","Rasmussen"],
+  ["Jaunette","Reyes"],
+  ["Owen","Reynolds"],
+  ["Kelsie","Richardson"],
+  ["Rosio","Rivera"],
+  ["Franklin","Rizo"],
+  ["Zach","Roberts"],
+  ["Joseph","Rose"],
+  ["Kathryn","Sabersky"],
+  ["Melissa","Salinas"],
+  ["Eduardo","Sanchez"],
+  ["Sara","Schafer"],
+  ["Zackery","Schrenk"],
+  ["Gregory","Secrist"],
+  ["Brayden","Shoemaker"],
+  ["Tanner","Sillito"],
+  ["Pablo","Silvaz"],
+  ["Caleb","Smith"],
+  ["Ryan","Smith"],
+  ["Teague","Smyer"],
+  ["Nicholas","Snelson"],
+  ["Matthew","Sommercorn"],
+  ["Daniel","Spencer"],
+  ["Jade","Spencer"],
+  ["Malibu","Sprinkle"],
+  ["Mark","Stahmann"],
+  ["Haylee","Stalions"],
+  ["Kjell","Stamminger"],
+  ["Jill","Stellingwerf"],
+  ["Brynne","Stenovich"],
+  ["Evan","Stone"],
+  ["Sterling","Strickland"],
+  ["James","Takacs"],
+  ["Trinidad","Talamantes"],
+  ["Landon","Talbot"],
+  ["Jack","Tanis"],
+  ["Jacob","Telles"],
+  ["David","Ten"],
+  ["Mercedes","Tena"],
+  ["Dorothy","Thaxton"],
+  ["Amanda","Tilley"],
+  ["Ashley","Tilley"],
+  ["Rayce","Tohara"],
+  ["Rylee","Tomicic"],
+  ["Jeremy","Toner"],
+  ["Teeghan","Turner"],
+  ["Nina","Twitchell"],
+  ["Erick","Vega"],
+  ["Julie","Vosdoganis"],
+  ["Dalton","Wallace"],
+  ["Gavin","Welch"],
+  ["Kyle","Whitchurch"],
+  ["Audrey","Williams"],
+  ["Brandon","Williams"],
+  ["Corbin","Williams"],
+  ["David","Williams"],
+  ["Jesse","Williams"],
+  ["Jessica","Wilson"],
+  ["Ashley","Wimmer"],
+  ["James","Wirthlin"],
+  ["Craig","Wright"],
+  ["Chase","Zundel"],
 ];
 
 let currentFilter = 'all';
+let PEOPLE = [];
 
 function overallStatus(s, b) {
   if (s === 'done' && b === 'done') return 'both';
   if (s === 'none' && b === 'none') return 'none';
   return 'partial';
 }
-
-function badgeHtml(status, label) {
+function badgeHtml(status) {
   if (status === 'done') return `<span class="badge-done">✅ Signed</span>`;
   if (status === 'pending') return `<span class="badge-pending">⚠️ Verify Email</span>`;
   return `<span class="badge-none">❌ Not Signed</span>`;
 }
-
 function overallIcon(s, b) {
   const o = overallStatus(s, b);
   if (o === 'both') return `<span class="overall-done">✅</span>`;
   if (o === 'partial') return `<span class="overall-partial">⚠️</span>`;
   return `<span class="overall-none">❌</span>`;
 }
-
 function highlight(text, q) {
   if (!q) return text;
   const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
   return text.replace(re, '<mark>$1</mark>');
 }
-
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   render(document.getElementById('search').value);
 }
-
 function render(q) {
   const query = q.trim().toLowerCase();
   let filtered = PEOPLE.filter(([first, last]) =>
     !query || first.toLowerCase().includes(query) || last.toLowerCase().includes(query) ||
     `${first} ${last}`.toLowerCase().includes(query)
   );
-
-  if (currentFilter === 'both') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'both');
-  if (currentFilter === 'partial') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'partial');
-  if (currentFilter === 'none') filtered = filtered.filter(([,, s, b]) => overallStatus(s,b) === 'none');
+  if (currentFilter === 'both') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'both');
+  if (currentFilter === 'partial') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'partial');
+  if (currentFilter === 'none') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'none');
 
   const tbody = document.getElementById('tableBody');
-  const noResults = document.getElementById('noResults');
   tbody.innerHTML = '';
-
-  if (filtered.length === 0) {
-    noResults.style.display = 'block';
-    document.getElementById('resultCount').textContent = '';
-    return;
-  }
-
-  noResults.style.display = 'none';
-  document.getElementById('resultCount').textContent = query || currentFilter !== 'all'
+  document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+  document.getElementById('resultCount').textContent = (query || currentFilter !== 'all')
     ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
-    : `${PEOPLE.length} people total`;
+    : `${PEOPLE.length} people — live data`;
 
   filtered.forEach(([first, last, snow, buck]) => {
-    const name = `${first} ${last}`;
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td class="name-cell">${highlight(name, q.trim())}</td>
+      <td class="name-cell">${highlight(`${first} ${last}`, q.trim())}</td>
       <td>${badgeHtml(snow)}</td>
       <td>${badgeHtml(buck)}</td>
       <td>${overallIcon(snow, buck)}</td>
@@ -600,36 +585,43 @@ function render(q) {
     tbody.appendChild(tr);
   });
 }
-
 function updateStats() {
-  const total = PEOPLE.length;
-  const both = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'both').length;
-  const partial = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'partial').length;
-  const none = PEOPLE.filter(([,, s, b]) => overallStatus(s,b) === 'none').length;
-  document.getElementById('statAll').textContent = total;
-  document.getElementById('statBoth').textContent = both;
-  document.getElementById('statPartial').textContent = partial;
-  document.getElementById('statNone').textContent = none;
+  document.getElementById('statAll').textContent = PEOPLE.length;
+  document.getElementById('statBoth').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'both').length;
+  document.getElementById('statPartial').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'partial').length;
+  document.getElementById('statNone').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'none').length;
 }
 
 const searchInput = document.getElementById('search');
 const clearBtn = document.getElementById('clearBtn');
-
 searchInput.addEventListener('input', () => {
   clearBtn.style.display = searchInput.value ? 'block' : 'none';
   render(searchInput.value);
 });
 clearBtn.addEventListener('click', () => {
-  searchInput.value = '';
-  clearBtn.style.display = 'none';
-  searchInput.focus();
-  render('');
+  searchInput.value = ''; clearBtn.style.display = 'none';
+  searchInput.focus(); render('');
 });
 
-// Init
 document.querySelector('.stat-chip.all').classList.add('active');
-updateStats();
-render('');
+document.getElementById('resultCount').textContent = 'Loading…';
+
+fetch('/api/waivers')
+  .then(r => r.json())
+  .then(waiverMap => {
+    PEOPLE = PARTY.map(([first, last]) => {
+      const key = `${first} ${last}`.toLowerCase();
+      const w = waiverMap[key] || { snow: 'none', buck: 'none' };
+      return [first, last, w.snow, w.buck];
+    });
+    updateStats();
+    render('');
+  })
+  .catch(() => {
+    PEOPLE = PARTY.map(([f, l]) => [f, l, 'none', 'none']);
+    updateStats();
+    render('');
+  });
 </script>
 </body>
 </html>
