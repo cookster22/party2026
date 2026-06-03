@@ -204,7 +204,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const map = await getWaivers();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-      res.end(JSON.stringify(map));
+      res.end(JSON.stringify({ waivers: map, updatedAt: new Date().toISOString(), source: SW_API_KEY ? 'live' : 'baseline' }));
     } catch (e) {
       res.writeHead(500); res.end('{}');
     }
