@@ -14,8 +14,7 @@ const MIME = {
   '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp',
 };
 
-// ── CSV baseline (all historical waivers before live API cutoff) ──────────────
-// status: 'done' | 'pending' | 'none'
+// ── CSV baseline ──────────────────────────────────────────────────────────────
 const CSV_BASELINE = {
   "jaime alamillo":         { snow: 'done', buck: 'done' },
   "easton anderson":        { snow: 'done', buck: 'none' },
@@ -141,14 +140,15 @@ const CSV_BASELINE = {
   "chase zundel":           { snow: 'done', buck: 'none' },
 };
 
-// Fetch all waivers for a given template from the API
-function fetchWaivers(templateId) {
+// ── Smartwaiver API helpers ───────────────────────────────────────────────────
+function swFetch(params) {
   return new Promise((resolve) => {
     if (!SW_API_KEY) return resolve([]);
-    const url = `https://api.smartwaiver.com/v4/waivers?limit=100&templateId=${templateId}`;
+    const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+    const url = `https://api.smartwaiver.com/v4/waivers?${qs}`;
     https.get(url, { headers: { 'sw-api-key': SW_API_KEY } }, (res) => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', c => data += c);
       res.on('end', () => {
         try { resolve(JSON.parse(data).waivers || []); }
         catch { resolve([]); }
@@ -157,12 +157,61 @@ function fetchWaivers(templateId) {
   });
 }
 
-// Build live waiver map from API data, merging over CSV baseline
+// Fetch a time window, auto-splitting into 15-min sub-windows if it hits the 100 cap
+async function fetchWindow(fromDts, toDts) {
+  const w = await swFetch({ limit: 100, fromDts, toDts });
+  if (w.length < 100) return w;
+
+  // Hit cap — split into 15-min sub-windows
+  const from = new Date(fromDts);
+  const to   = new Date(toDts);
+  const span = (to - from) / 4; // 4 equal sub-windows
+  if (span < 5 * 60 * 1000) return w; // already tiny, can't split further
+
+  const results = [];
+  for (let i = 0; i < 4; i++) {
+    const s = new Date(from.getTime() + i * span);
+    const e = new Date(from.getTime() + (i + 1) * span);
+    const fmt = d => d.toISOString().replace('T', 'T').slice(0, 19);
+    const sub = await fetchWindow(fmt(s), fmt(e));
+    results.push(...sub);
+  }
+  return results;
+}
+
+// Generate hourly windows from Jun 2 2026 through Jun 7 2026 (local time as ISO strings)
+function getWindows() {
+  const windows = [];
+  // Start Jun 2 22:00 (first waivers) through Jun 7 00:00
+  const start = new Date('2026-06-02T22:00:00');
+  const end   = new Date('2026-06-07T00:00:00');
+  let cur = start;
+  while (cur < end) {
+    const next = new Date(cur.getTime() + 60 * 60 * 1000); // 1-hour windows
+    const fmt = d => d.toISOString().replace(/\.\d{3}Z$/, '').replace('Z','');
+    windows.push([fmt(cur), fmt(next > end ? end : next)]);
+    cur = next;
+  }
+  return windows;
+}
+
+// Build full waiver map from all time windows
+async function fetchAllWaivers() {
+  const windows = getWindows();
+  const allWaivers = [];
+  for (const [from, to] of windows) {
+    const w = await fetchWindow(from, to);
+    allWaivers.push(...w);
+  }
+  return allWaivers;
+}
+
+function toStatus(verified) {
+  return verified ? 'done' : 'pending';
+}
+
 async function buildWaiverMap() {
-  const [snowWaivers, buckWaivers] = await Promise.all([
-    fetchWaivers(SNOWBASIN_TEMPLATE),
-    fetchWaivers(BUCKWILD_TEMPLATE),
-  ]);
+  const allWaivers = await fetchAllWaivers();
 
   // Start with CSV baseline
   const map = {};
@@ -170,25 +219,22 @@ async function buildWaiverMap() {
     map[key] = { snow: val.snow, buck: val.buck };
   }
 
-  // Overlay live API data (live wins)
-  for (const w of snowWaivers) {
-    const key = `${w.firstName} ${w.lastName}`.toLowerCase();
+  // Overlay live API data (live wins over baseline)
+  for (const w of allWaivers) {
+    const key = `${w.firstName.trim()} ${w.lastName.trim()}`.toLowerCase();
     if (!map[key]) map[key] = { snow: 'none', buck: 'none' };
-    map[key].snow = w.verified ? 'done' : 'pending';
-  }
-  for (const w of buckWaivers) {
-    const key = `${w.firstName} ${w.lastName}`.toLowerCase();
-    if (!map[key]) map[key] = { snow: 'none', buck: 'none' };
-    map[key].buck = w.verified ? 'done' : 'pending';
+    if (w.templateId === SNOWBASIN_TEMPLATE) map[key].snow = toStatus(w.verified);
+    if (w.templateId === BUCKWILD_TEMPLATE)  map[key].buck = toStatus(w.verified);
   }
 
+  console.log(`[waivers] fetched ${allWaivers.length} records, ${Object.keys(map).length} unique names`);
   return map;
 }
 
-// Cache waivers for 2 minutes so we don't hammer the API
+// Cache: refresh every 3 minutes
 let waiverCache = null;
 let waiverCacheTime = 0;
-const CACHE_TTL = 2 * 60 * 1000;
+const CACHE_TTL = 3 * 60 * 1000;
 
 async function getWaivers() {
   if (waiverCache && Date.now() - waiverCacheTime < CACHE_TTL) return waiverCache;
@@ -199,19 +245,22 @@ async function getWaivers() {
 
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
-  // API endpoint
   if (req.url === '/api/waivers') {
     try {
       const map = await getWaivers();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-      res.end(JSON.stringify({ waivers: map, updatedAt: new Date().toISOString(), source: SW_API_KEY ? 'live' : 'baseline' }));
+      res.end(JSON.stringify({
+        waivers: map,
+        updatedAt: new Date().toISOString(),
+        source: SW_API_KEY ? 'live' : 'baseline',
+      }));
     } catch (e) {
+      console.error('[waivers] error:', e.message);
       res.writeHead(500); res.end('{}');
     }
     return;
   }
 
-  // Static files
   const url = req.url === '/' ? '/index.html' : req.url.split('?')[0];
   const filePath = path.join(__dirname, 'public', url);
   const ext = path.extname(filePath);
