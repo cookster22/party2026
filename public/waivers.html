@@ -293,6 +293,26 @@
   <div class="no-results" id="noResults" style="display:none">No one found.</div>
 </div>
 
+<!-- Guests / Plus-Ones section -->
+<div class="table-section" id="guestSection" style="display:none">
+  <div style="border-top:1px solid #3a2a1a;margin-bottom:20px;"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <span style="font-size:1rem;font-weight:700;color:#f5d080;">👥 Guests & Plus-Ones</span>
+    <span style="font-size:0.8rem;color:#9a8060;">Signed a waiver but not on the main attendee list</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Snowbasin</th>
+        <th>Buck Wild</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="guestBody"></tbody>
+  </table>
+</div>
+
 <script>
 // Party list — names only; waiver statuses fetched live from /api/waivers
 const PARTY = [
@@ -615,7 +635,7 @@ document.getElementById('resultCount').textContent = 'Loading…';
 
 fetch('/api/waivers')
   .then(r => r.json())
-  .then(({ waivers: waiverMap, updatedAt, source }) => {
+  .then(({ waivers: waiverMap, guests, updatedAt, source }) => {
     PEOPLE = PARTY.map(([first, last]) => {
       const key = `${first} ${last}`.toLowerCase();
       const w = waiverMap[key] || { snow: 'none', buck: 'none' };
@@ -623,6 +643,23 @@ fetch('/api/waivers')
     });
     updateStats();
     render('');
+
+    // Render guests section
+    if (guests && guests.length > 0) {
+      const guestBody = document.getElementById('guestBody');
+      guestBody.innerHTML = '';
+      guests.forEach(({ firstName, lastName, snow, buck }) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="name-cell">${firstName} ${lastName}</td>
+          <td>${badgeHtml(snow)}</td>
+          <td>${badgeHtml(buck)}</td>
+          <td>${overallIcon(snow, buck)}</td>
+        `;
+        guestBody.appendChild(tr);
+      });
+      document.getElementById('guestSection').style.display = 'block';
+    }
 
     // Status indicator
     const dot = document.getElementById('apiDot');

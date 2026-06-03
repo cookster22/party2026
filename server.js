@@ -210,6 +210,57 @@ function toStatus(verified) {
   return verified ? 'done' : 'pending';
 }
 
+// Party list keys (for guest detection)
+const PARTY_KEYS = new Set([
+  "gianfranco aciego","ethan aguinaga","jaime alamillo","aaron albrechtsen","burke alder",
+  "easton anderson","julie anderson","rhett anderson","dallas andrade","brenda arambula",
+  "carlee arthur","zach baker","austin bakker","shane ball","dustin barrilleaux",
+  "nermin bektic","madeline birtcher","daniel bjornn","jaden blacker","jenna blacker",
+  "kyle boblett","tanner bodily","persephone bohon","michael bradshaw","fidel bravo",
+  "hunter breshears","benjamin briten","candice brizuela","adam broud","lindsey broud",
+  "marisa bruce","jon brusch","katelyn call","lizbeth calvillo","veronica campos",
+  "gabriel cano","yadira castillo","amelia chacon","lexus chavez","lilianah chavez",
+  "easton christiansen","austin chugg","cameron clark","lautaro colazo","jeremy conterio",
+  "kylen conterio","david cook","chip cook","matt cook","zander cook","dominique coon",
+  "frank corbett","samuel corbett","joshua cruz","ian cuillard","bradie dains",
+  "katherine davidson","brennen davis","evan davis","malia davis","edin dzindo",
+  "trevor durfey","william edwards","nicholis egbert","davis england","houston ewing",
+  "carli fairchild","paytan fairchild","jasmin fedaie","joshua ferry","nicholas filetti",
+  "kyle fowers","saran garcia","jacob garner","brian garstka","avery giles","alexis gilliam",
+  "bentley glover","trevor gosar","rebecca graham","laci greene","colton griffith",
+  "natassja grossman","matteo guerrieri","leigha gutierrez","vanessa gutierrez",
+  "taylour hanson","dallin hatch","jonathan hernandez","carson hoch","rylie hockenbury",
+  "ryan horton","andy huerta","diego ibarra","parker jackson","samuel jaggi","cory jeffs",
+  "andrew jensen","kayla jensen","nathan jensen","garret joiret","olivia jones",
+  "arlette juarez","cesar juarez","felisha juarez","isela juarez","raquel juarez",
+  "yesenia juarez","yvette juarez","sara kapsimalis","ryan kesler","mobina khazei",
+  "creighton king","nathaniel kirk","jordan knudsen","hanna kolsen","aidan kuhlman",
+  "joshua kuhn","noah kumrow","harrison larsen","owen larson","kira laub",
+  "nathaniel leishman","devin lethbridge","brady lewis","caleb loveland","christian luiten",
+  "ryan madsen","matthew mahony","aliya maldonado","dixie mann","zachary martin",
+  "jonathan martinez","julissa martinez","katelyn mayner","kiera mcguire","misty mckenzie",
+  "preston mcpheters","roanne mediati","jacob meiners","vanessa mercado","schylar mills",
+  "kevin millward","jera mitchell","london mitchell","kendra molina-lacy","destiny nelson",
+  "bryce nicoll","christian nielsen","dustin nielsen","kambren nielson","uela nifo",
+  "michael o'brien","jacoby o'connell","esau ocrospoma","guadalupe ornelas","kearra orth",
+  "trevor patten","zavian pelayo","emily pena-gil","bradley perkins","kevin perkins",
+  "john petitta","chase pickett","ashley pliler","alishia proctor","joshua putnam",
+  "angelica quezada","christine rallison","randy ramirez","yesenia ramirez","emily rasmussen",
+  "gary rasmussen","haleigh rasmussen","sadie rasmussen","jaunette reyes","owen reynolds",
+  "kelsie richardson","rosio rivera","franklin rizo","zach roberts","joseph rose",
+  "kathryn sabersky","melissa salinas","eduardo sanchez","sara schafer","zackery schrenk",
+  "gregory secrist","brayden shoemaker","tanner sillito","pablo silvaz","caleb smith",
+  "ryan smith","teague smyer","nicholas snelson","matthew sommercorn","daniel spencer",
+  "jade spencer","malibu sprinkle","mark stahmann","haylee stalions","kjell stamminger",
+  "jill stellingwerf","brynne stenovich","evan stone","sterling strickland","james takacs",
+  "trinidad talamantes","landon talbot","jack tanis","jacob telles","david ten",
+  "mercedes tena","dorothy thaxton","amanda tilley","ashley tilley","rayce tohara",
+  "rylee tomicic","jeremy toner","teeghan turner","nina twitchell","erick vega",
+  "julie vosdoganis","dalton wallace","gavin welch","kyle whitchurch","audrey williams",
+  "brandon williams","corbin williams","david williams","jesse williams","jessica wilson",
+  "ashley wimmer","james wirthlin","craig wright","chase zundel",
+]);
+
 async function buildWaiverMap() {
   const allWaivers = await fetchAllWaivers();
 
@@ -219,16 +270,35 @@ async function buildWaiverMap() {
     map[key] = { snow: val.snow, buck: val.buck };
   }
 
-  // Overlay live API data (live wins over baseline)
+  // Track all unique signers from API (to detect guests)
+  const apiSigners = new Map(); // key -> {firstName, lastName, snow, buck}
+
   for (const w of allWaivers) {
-    const key = `${w.firstName.trim()} ${w.lastName.trim()}`.toLowerCase();
+    const first = w.firstName.trim();
+    const last  = w.lastName.trim();
+    const key   = `${first} ${last}`.toLowerCase();
+    if (!apiSigners.has(key)) apiSigners.set(key, { firstName: first, lastName: last, snow: 'none', buck: 'none' });
+    const s = apiSigners.get(key);
+    if (w.templateId === SNOWBASIN_TEMPLATE) s.snow = toStatus(w.verified);
+    if (w.templateId === BUCKWILD_TEMPLATE)  s.buck = toStatus(w.verified);
+    // Overlay into main map
     if (!map[key]) map[key] = { snow: 'none', buck: 'none' };
     if (w.templateId === SNOWBASIN_TEMPLATE) map[key].snow = toStatus(w.verified);
     if (w.templateId === BUCKWILD_TEMPLATE)  map[key].buck = toStatus(w.verified);
   }
 
-  console.log(`[waivers] fetched ${allWaivers.length} records, ${Object.keys(map).length} unique names`);
-  return map;
+  // Build guests list: signed waivers but not on party list
+  const guests = [];
+  for (const [key, s] of apiSigners) {
+    if (!PARTY_KEYS.has(key)) {
+      guests.push({ firstName: s.firstName, lastName: s.lastName, snow: s.snow, buck: s.buck });
+    }
+  }
+  // Sort guests alphabetically by last name
+  guests.sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName));
+
+  console.log(`[waivers] fetched ${allWaivers.length} records, ${Object.keys(map).length} unique, ${guests.length} guests`);
+  return { map, guests };
 }
 
 // Cache: refresh every 3 minutes
@@ -238,7 +308,8 @@ const CACHE_TTL = 3 * 60 * 1000;
 
 async function getWaivers() {
   if (waiverCache && Date.now() - waiverCacheTime < CACHE_TTL) return waiverCache;
-  waiverCache = await buildWaiverMap();
+  const result = await buildWaiverMap();
+  waiverCache = result;
   waiverCacheTime = Date.now();
   return waiverCache;
 }
@@ -247,10 +318,11 @@ async function getWaivers() {
 const server = http.createServer(async (req, res) => {
   if (req.url === '/api/waivers') {
     try {
-      const map = await getWaivers();
+      const { map, guests } = await getWaivers();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       res.end(JSON.stringify({
         waivers: map,
+        guests,
         updatedAt: new Date().toISOString(),
         source: SW_API_KEY ? 'live' : 'baseline',
       }));
