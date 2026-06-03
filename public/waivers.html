@@ -612,11 +612,13 @@ function render(q) {
     tbody.appendChild(tr);
   });
 }
+let GUESTS = [];
 function updateStats() {
-  document.getElementById('statAll').textContent = PEOPLE.length;
-  document.getElementById('statBoth').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'both').length;
-  document.getElementById('statPartial').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'partial').length;
-  document.getElementById('statNone').textContent = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'none').length;
+  const all = [...PEOPLE, ...GUESTS];
+  document.getElementById('statAll').textContent = all.length;
+  document.getElementById('statBoth').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'both').length;
+  document.getElementById('statPartial').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'partial').length;
+  document.getElementById('statNone').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'none').length;
 }
 
 const searchInput = document.getElementById('search');
@@ -643,6 +645,10 @@ fetch('/api/waivers')
     });
     updateStats();
     render('');
+
+    // Populate GUESTS for stats
+    GUESTS = (guests || []).map(g => [g.firstName, g.lastName, g.snow, g.buck]);
+    updateStats(); // re-run stats now that guests are loaded
 
     // Render guests section
     if (guests && guests.length > 0) {
