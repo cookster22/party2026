@@ -198,6 +198,18 @@
     .no-results { text-align: center; padding: 40px 20px; color: #6a5040; font-style: italic; }
 
     mark { background: rgba(184,134,11,0.35); color: inherit; border-radius: 2px; }
+    .type-employee {
+      display: inline-block; background: rgba(184,134,11,0.12); border: 1px solid rgba(184,134,11,0.3);
+      border-radius: 5px; padding: 2px 8px; font-size: 0.72rem; color: #c9a96e; white-space: nowrap;
+    }
+    .type-guest {
+      display: inline-block; background: rgba(135,206,235,0.1); border: 1px solid rgba(135,206,235,0.25);
+      border-radius: 5px; padding: 2px 8px; font-size: 0.72rem; color: #87ceeb; white-space: nowrap;
+    }
+    @media (max-width: 500px) {
+      thead th:nth-child(2) { display: none; }
+      tbody td:nth-child(2) { display: none; }
+    }
 
     @media (max-width: 500px) {
       thead th:nth-child(4) { display: none; }
@@ -254,6 +266,14 @@
     <div class="num" id="statNone">—</div>
     <div class="lbl">None Signed ❌</div>
   </div>
+  <div class="stat-chip" style="border-color:#c9a96e;" data-filter="employee" onclick="setFilter('employee',this)">
+    <div class="num" id="statEmployee" style="color:#c9a96e;">—</div>
+    <div class="lbl">Employees</div>
+  </div>
+  <div class="stat-chip" style="border-color:#87ceeb;" data-filter="guest" onclick="setFilter('guest',this)">
+    <div class="num" id="statGuest" style="color:#87ceeb;">—</div>
+    <div class="lbl">Guests / +1s</div>
+  </div>
 </div>
 
 <div style="max-width:700px;margin:16px auto 0;padding:0 16px;">
@@ -284,6 +304,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Snowbasin</th>
         <th>Buck Wild</th>
         <th>Status</th>
@@ -292,26 +313,6 @@
     <tbody id="tableBody"></tbody>
   </table>
   <div class="no-results" id="noResults" style="display:none">No one found.</div>
-</div>
-
-<!-- Guests / Plus-Ones section -->
-<div class="table-section" id="guestSection" style="display:none">
-  <div style="border-top:1px solid #3a2a1a;margin-bottom:20px;"></div>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-    <span style="font-size:1rem;font-weight:700;color:#f5d080;">👥 Guests & Plus-Ones</span>
-    <span style="font-size:0.8rem;color:#9a8060;">Signed a waiver but not on the main attendee list</span>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Snowbasin</th>
-        <th>Buck Wild</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="guestBody"></tbody>
-  </table>
 </div>
 
 <script>
@@ -591,6 +592,8 @@ function render(q) {
   if (currentFilter === 'both') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'both');
   if (currentFilter === 'partial') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'partial');
   if (currentFilter === 'none') filtered = filtered.filter(([,,s,b]) => overallStatus(s,b) === 'none');
+  if (currentFilter === 'employee') filtered = filtered.filter(([,,,,t]) => t === 'employee');
+  if (currentFilter === 'guest') filtered = filtered.filter(([,,,,t]) => t === 'guest');
 
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
@@ -599,10 +602,14 @@ function render(q) {
     ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
     : `${PEOPLE.length} people — live data`;
 
-  filtered.forEach(([first, last, snow, buck]) => {
+  filtered.forEach(([first, last, snow, buck, type]) => {
     const tr = document.createElement('tr');
+    const typeBadge = type === 'employee'
+      ? '<span class="type-employee">Employee</span>'
+      : '<span class="type-guest">Guest / +1</span>';
     tr.innerHTML = `
       <td class="name-cell">${highlight(`${first} ${last}`, q.trim())}</td>
+      <td>${typeBadge}</td>
       <td>${badgeHtml(snow)}</td>
       <td>${badgeHtml(buck)}</td>
       <td>${overallIcon(snow, buck)}</td>
@@ -610,13 +617,13 @@ function render(q) {
     tbody.appendChild(tr);
   });
 }
-let GUESTS = [];
 function updateStats() {
-  const all = [...PEOPLE, ...GUESTS];
-  document.getElementById('statAll').textContent = all.length;
-  document.getElementById('statBoth').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'both').length;
-  document.getElementById('statPartial').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'partial').length;
-  document.getElementById('statNone').textContent = all.filter(([,,s,b]) => overallStatus(s,b) === 'none').length;
+  document.getElementById('statAll').textContent      = PEOPLE.length;
+  document.getElementById('statBoth').textContent     = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'both').length;
+  document.getElementById('statPartial').textContent  = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'partial').length;
+  document.getElementById('statNone').textContent     = PEOPLE.filter(([,,s,b]) => overallStatus(s,b) === 'none').length;
+  document.getElementById('statEmployee').textContent = PEOPLE.filter(([,,,,t]) => t === 'employee').length;
+  document.getElementById('statGuest').textContent    = PEOPLE.filter(([,,,,t]) => t === 'guest').length;
 }
 
 const searchInput = document.getElementById('search');
@@ -636,34 +643,25 @@ document.getElementById('resultCount').textContent = 'Loading…';
 fetch('/api/waivers')
   .then(r => r.json())
   .then(({ waivers: waiverMap, guests, updatedAt, source }) => {
-    PEOPLE = PARTY.map(([first, last]) => {
+    // Employees from PARTY list
+    const employees = PARTY.map(([first, last]) => {
       const key = `${first} ${last}`.toLowerCase();
       const w = waiverMap[key] || { snow: 'none', buck: 'none' };
-      return [first, last, w.snow, w.buck];
+      return [first, last, w.snow, w.buck, 'employee'];
     });
+
+    // Guests / plus-ones from API
+    const guestRows = (guests || []).map(g => [g.firstName, g.lastName, g.snow, g.buck, 'guest']);
+
+    // Merge and sort alphabetically by last name then first name
+    PEOPLE = [...employees, ...guestRows].sort((a, b) => {
+      const la = a[1].toLowerCase(), lb = b[1].toLowerCase();
+      if (la !== lb) return la.localeCompare(lb);
+      return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+    });
+
     updateStats();
     render('');
-
-    // Populate GUESTS for stats
-    GUESTS = (guests || []).map(g => [g.firstName, g.lastName, g.snow, g.buck]);
-    updateStats(); // re-run stats now that guests are loaded
-
-    // Render guests section
-    if (guests && guests.length > 0) {
-      const guestBody = document.getElementById('guestBody');
-      guestBody.innerHTML = '';
-      guests.forEach(({ firstName, lastName, snow, buck }) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="name-cell">${firstName} ${lastName}</td>
-          <td>${badgeHtml(snow)}</td>
-          <td>${badgeHtml(buck)}</td>
-          <td>${overallIcon(snow, buck)}</td>
-        `;
-        guestBody.appendChild(tr);
-      });
-      document.getElementById('guestSection').style.display = 'block';
-    }
 
     // Status indicator
     const dot = document.getElementById('apiDot');
@@ -676,8 +674,8 @@ fetch('/api/waivers')
       ? `Live data from Smartwaiver — last updated ${ts}`
       : `Showing baseline data (no API key) — last checked ${ts}`;
   })
-  .catch(err => {
-    PEOPLE = PARTY.map(([f, l]) => [f, l, 'none', 'none']);
+  .catch(() => {
+    PEOPLE = PARTY.map(([f, l]) => [f, l, 'none', 'none', 'employee']);
     updateStats();
     render('');
     document.getElementById('apiDot').style.background = '#e53935';
