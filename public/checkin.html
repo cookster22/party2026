@@ -91,6 +91,11 @@
     .result-name { font-weight: 600; font-size: 1rem; }
     .result-arrow { color: #6a5040; }
 
+    .countdown-wrap { margin-top: 20px; }
+    .countdown-bar { height: 4px; background: #3a2510; border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .countdown-fill { height: 100%; background: #b8860b; border-radius: 2px; width: 100%; transition: width 1s linear; }
+    .countdown-label { font-size: 0.8rem; color: #6a5040; text-align: center; }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -124,6 +129,11 @@
       </div>
     </div>
 
+    <div class="countdown-wrap">
+      <div class="countdown-bar"><div class="countdown-fill" id="countdownFill"></div></div>
+      <p class="countdown-label" id="countdownLabel">Closing in 5…</p>
+    </div>
+
   </div>
 
   <!-- Already checked in screen -->
@@ -131,6 +141,10 @@
     <div class="check-circle">🎉</div>
     <div class="welcome-name" id="alreadyName"></div>
     <div class="welcome-sub">You're already checked in — go have fun!</div>
+    <div class="countdown-wrap">
+      <div class="countdown-bar"><div class="countdown-fill" id="countdownFill2"></div></div>
+      <p class="countdown-label" id="countdownLabel2">Closing in 5…</p>
+    </div>
   </div>
 
 <script>
@@ -138,6 +152,26 @@ const GUESTS = [];  // populated from server
 
 let currentEmail = null;
 let plusOneSet = false;
+let countdownTimer = null;
+
+function startCountdown(fillId, labelId, seconds = 6) {
+  clearTimeout(countdownTimer);
+  let remaining = seconds;
+  const fill = document.getElementById(fillId);
+  const label = document.getElementById(labelId);
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+
+  function tick() {
+    remaining--;
+    if (remaining <= 0) { reset(); return; }
+    fill.style.transition = 'width 1s linear';
+    fill.style.width = (remaining / seconds * 100) + '%';
+    label.textContent = `Closing in ${remaining}…`;
+    countdownTimer = setTimeout(tick, 1000);
+  }
+  countdownTimer = setTimeout(tick, 1000);
+}
 
 async function doEmailCheckin() {
   const email = document.getElementById('emailInput').value.trim().toLowerCase();
@@ -186,12 +220,14 @@ function showSuccess(name, vip) {
   plusOneSet = false;
   document.getElementById('btnYes').classList.remove('selected');
   document.getElementById('btnNo').classList.remove('selected');
+  startCountdown('countdownFill', 'countdownLabel');
 }
 
 function showAlready(name) {
   hide('emailScreen');
   document.getElementById('alreadyName').textContent = name;
   show('alreadyScreen');
+  startCountdown('countdownFill2', 'countdownLabel2');
 }
 
 async function setPlusOne(val) {
@@ -206,6 +242,7 @@ async function setPlusOne(val) {
 }
 
 function reset() {
+  clearTimeout(countdownTimer);
   currentEmail = null;
   hide('successScreen'); hide('alreadyScreen');
   document.getElementById('emailInput').value = '';
