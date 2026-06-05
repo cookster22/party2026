@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Lease End Party — Check In</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a120b; color: #f5ece0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px 20px 48px; }
+
+    .logo { width: 52px; height: 52px; border-radius: 12px; margin-bottom: 16px; margin-top: 8px; }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #f5d080; text-align: center; margin-bottom: 4px; }
+    .subtitle { font-size: 0.95rem; color: #c9a96e; text-align: center; margin-bottom: 32px; }
+
+    .card { background: #2a1a0e; border: 1px solid #4a3020; border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 420px; }
+
+    label { display: block; font-size: 0.82rem; color: #a89070; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+    input[type="email"], input[type="text"] {
+      width: 100%; padding: 16px 18px; font-size: 1.05rem; border-radius: 10px;
+      border: 2px solid #4a3020; background: #1a120b; color: #f5ece0; outline: none;
+      transition: border-color 0.2s; margin-bottom: 16px;
+    }
+    input:focus { border-color: #b8860b; }
+    input::placeholder { color: #6a5040; }
+
+    .btn-primary {
+      width: 100%; padding: 18px; font-size: 1.1rem; font-weight: 700;
+      background: #b8860b; color: #1a120b; border: none; border-radius: 12px;
+      cursor: pointer; transition: background 0.15s; letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { background: #d4a012; }
+    .btn-primary:active { background: #96700a; }
+    .btn-primary:disabled { background: #4a3020; color: #6a5040; cursor: default; }
+
+    .btn-secondary {
+      width: 100%; padding: 14px; font-size: 0.95rem; font-weight: 600;
+      background: transparent; color: #c9a96e; border: 1px solid #4a3020; border-radius: 10px;
+      cursor: pointer; margin-top: 10px; transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: rgba(184,134,11,0.1); }
+
+    .error-msg { color: #ff8070; font-size: 0.88rem; margin-top: 6px; min-height: 20px; }
+
+    /* Success screen */
+    .success-screen { text-align: center; }
+    .check-circle { font-size: 4rem; margin-bottom: 12px; }
+    .welcome-name { font-size: 1.8rem; font-weight: 800; color: #f5d080; margin-bottom: 6px; }
+    .welcome-sub { font-size: 1rem; color: #c9a96e; margin-bottom: 28px; }
+
+    .vip-badge {
+      display: inline-block; background: #b8860b; color: #1a120b;
+      font-weight: 800; font-size: 0.8rem; padding: 4px 12px;
+      border-radius: 20px; letter-spacing: 0.1em; margin-bottom: 20px;
+    }
+
+    .plusone-box {
+      background: #1a120b; border: 2px solid #4a3020; border-radius: 14px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    .plusone-box p { font-size: 1rem; color: #c9a96e; margin-bottom: 16px; line-height: 1.5; }
+    .plusone-btns { display: flex; gap: 10px; }
+    .plusone-btns button {
+      flex: 1; padding: 14px; font-size: 0.95rem; font-weight: 700;
+      border-radius: 10px; border: 2px solid; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-yes { background: rgba(60,160,60,0.15); border-color: #4caf50; color: #90ee90; }
+    .btn-yes:hover, .btn-yes.selected { background: rgba(60,160,60,0.3); }
+    .btn-no { background: rgba(100,80,60,0.2); border-color: #6a5040; color: #9a8060; }
+    .btn-no:hover, .btn-no.selected { background: rgba(100,80,60,0.4); }
+
+    .already-badge {
+      background: rgba(60,160,60,0.15); border: 1px solid rgba(80,180,80,0.4);
+      border-radius: 10px; padding: 14px 18px; color: #90ee90;
+      font-size: 0.95rem; margin-bottom: 16px;
+    }
+
+    /* Fallback name search */
+    .fallback { margin-top: 20px; text-align: center; }
+    .fallback p { font-size: 0.88rem; color: #7a6050; margin-bottom: 12px; }
+
+    .search-results { margin-top: 12px; }
+    .result-item {
+      background: #1a120b; border: 1px solid #3a2510; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.15s;
+    }
+    .result-item:hover { background: rgba(184,134,11,0.1); border-color: #b8860b; }
+    .result-name { font-weight: 600; font-size: 1rem; }
+    .result-arrow { color: #6a5040; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <img src="/le-logo.png" class="logo" alt="LE">
+  <h1>Welcome! 🤠</h1>
+  <p class="subtitle">Lease End Party · Saturday, June 6</p>
+
+  <!-- Email check-in screen -->
+  <div class="card" id="emailScreen">
+    <label for="emailInput">Your work email address</label>
+    <input type="email" id="emailInput" placeholder="you@leaseend.com" autocomplete="email" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="error-msg" id="emailError"></div>
+    <button class="btn-primary" id="checkinBtn" onclick="doEmailCheckin()">Check Me In 🤠</button>
+    <button class="btn-secondary" onclick="showNameSearch()">Can't find me by email →</button>
+  </div>
+
+  <!-- Name search fallback -->
+  <div class="card hidden" id="nameScreen">
+    <label for="nameInput">Search your name</label>
+    <input type="text" id="nameInput" placeholder="Last name..." autocomplete="off" oninput="searchByName()">
+    <div class="search-results" id="nameResults"></div>
+    <button class="btn-secondary" onclick="showEmailScreen()">← Back</button>
+  </div>
+
+  <!-- Success screen -->
+  <div class="card success-screen hidden" id="successScreen">
+    <div class="check-circle">✅</div>
+    <div class="welcome-name" id="successName"></div>
+    <div id="vipBadge" class="vip-badge hidden">⭐ VIP Guest</div>
+    <div class="welcome-sub">You're checked in — enjoy the party!</div>
+
+    <div class="plusone-box" id="plusoneBox">
+      <p>Did you bring a <strong>+1</strong> tonight?</p>
+      <div class="plusone-btns">
+        <button class="btn-yes" id="btnYes" onclick="setPlusOne(true)">Yes, +1 with me</button>
+        <button class="btn-no" id="btnNo" onclick="setPlusOne(false)">Just me</button>
+      </div>
+    </div>
+
+    <button class="btn-secondary" onclick="reset()">Check in someone else</button>
+  </div>
+
+  <!-- Already checked in screen -->
+  <div class="card success-screen hidden" id="alreadyScreen">
+    <div class="check-circle">🎉</div>
+    <div class="welcome-name" id="alreadyName"></div>
+    <div class="welcome-sub">You're already checked in — go have fun!</div>
+    <button class="btn-secondary" onclick="reset()">Check in someone else</button>
+  </div>
+
+<script>
+const GUESTS = [];  // populated from server
+
+let currentEmail = null;
+let plusOneSet = false;
+
+async function doEmailCheckin() {
+  const email = document.getElementById('emailInput').value.trim().toLowerCase();
+  if (!email) { showError('Please enter your email address.'); return; }
+
+  const btn = document.getElementById('checkinBtn');
+  btn.disabled = true; btn.textContent = 'Checking in…';
+
+  try {
+    const r = await fetch('/api/self-checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await r.json();
+
+    if (r.status === 404) {
+      showError("Email not found. Try the name search below, or see a staff member.");
+      btn.disabled = false; btn.textContent = 'Check Me In 🤠';
+      return;
+    }
+    if (data.already) {
+      showAlready(data.name);
+      return;
+    }
+    if (data.success) {
+      currentEmail = email;
+      showSuccess(data.name, data.vip);
+      return;
+    }
+  } catch(e) {
+    showError('Connection error — please try again or see staff.');
+  }
+  btn.disabled = false; btn.textContent = 'Check Me In 🤠';
+}
+
+function showError(msg) {
+  document.getElementById('emailError').textContent = msg;
+}
+
+function showSuccess(name, vip) {
+  hide('emailScreen'); hide('nameScreen');
+  document.getElementById('successName').textContent = name;
+  if (vip) show('vipBadge'); else hide('vipBadge');
+  show('successScreen');
+  plusOneSet = false;
+  document.getElementById('btnYes').classList.remove('selected');
+  document.getElementById('btnNo').classList.remove('selected');
+}
+
+function showAlready(name) {
+  hide('emailScreen'); hide('nameScreen');
+  document.getElementById('alreadyName').textContent = name;
+  show('alreadyScreen');
+}
+
+async function setPlusOne(val) {
+  if (!currentEmail) return;
+  document.getElementById('btnYes').classList.toggle('selected', val);
+  document.getElementById('btnNo').classList.toggle('selected', !val);
+  await fetch('/api/self-plusone', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: currentEmail, value: val }),
+  });
+}
+
+function showNameSearch() {
+  hide('emailScreen'); show('nameScreen');
+  document.getElementById('nameInput').focus();
+}
+
+function showEmailScreen() {
+  hide('nameScreen'); show('emailScreen');
+}
+
+async function searchByName() {
+  const q = document.getElementById('nameInput').value.trim().toLowerCase();
+  const container = document.getElementById('nameResults');
+  if (q.length < 2) { container.innerHTML = ''; return; }
+
+  try {
+    const r = await fetch('/api/guests', { headers: { 'x-admin-token': '' } });
+    // For name search we just filter client-side from a public endpoint
+  } catch(e) {}
+
+  // Use embedded guest names for search (no token needed for names-only)
+  const matches = GUEST_NAMES.filter(g =>
+    g.name.toLowerCase().includes(q) ||
+    g.name.toLowerCase().split(' ').some(w => w.startsWith(q))
+  ).slice(0, 8);
+
+  container.innerHTML = matches.map(g => `
+    <div class="result-item" onclick="checkinByEmail('${g.email}', '${g.name.replace(/'/g,"\\'")}')">
+      <span class="result-name">${g.name}</span>
+      <span class="result-arrow">→</span>
+    </div>
+  `).join('');
+}
+
+async function checkinByEmail(email, name) {
+  const r = await fetch('/api/self-checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  const data = await r.json();
+  if (data.already) { showAlready(name); return; }
+  if (data.success) { currentEmail = email; showSuccess(data.name || name, data.vip); }
+}
+
+function reset() {
+  currentEmail = null;
+  hide('successScreen'); hide('alreadyScreen'); hide('nameScreen');
+  document.getElementById('emailInput').value = '';
+  document.getElementById('emailError').textContent = '';
+  document.getElementById('nameInput').value = '';
+  document.getElementById('nameResults').innerHTML = '';
+  document.getElementById('checkinBtn').disabled = false;
+  document.getElementById('checkinBtn').textContent = 'Check Me In 🤠';
+  show('emailScreen');
+  document.getElementById('emailInput').focus();
+}
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+// Allow Enter key to submit
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('emailInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doEmailCheckin();
+  });
+});
+</script>
+
+<script>
+// Guest names embedded for fallback name search (no auth needed)
+const GUEST_NAMES = [
+  {name:"Gianfranco Aciego",email:"gianfranco.aciego@leaseend.com"},
+  {name:"Ethan Aguinaga",email:"ethan.aguinaga@leaseend.com"},
+  {name:"Jaime Alamillo",email:"jaime.alamillo@leaseend.com"},
+  {name:"Aaron Albrechtsen",email:"aaron.albrechtsen@leaseend.com"},
+  {name:"Burke Alder",email:"burke.alder@leaseend.com"},
+  {name:"Easton Anderson",email:"easton.anderson@leaseend.com"},
+  {name:"Julie Anderson",email:"julie.anderson@leaseend.com"},
+  {name:"Rhett Anderson",email:"rhett.anderson@leaseend.com"},
+  {name:"Dallas Andrade",email:"dallas.andrade@leaseend.com"},
+  {name:"Brenda Arambula",email:"brenda.arambula@leaseend.com"},
+  {name:"Carlee Arthur",email:"carlee.hellstrom@leaseend.com"},
+  {name:"Zach Baker",email:"zach.baker@leaseend.com"},
+  {name:"Austin Bakker",email:"austin.bakker@leaseend.com"},
+  {name:"Shane Ball",email:"shane.ball@leaseend.com"},
+  {name:"Dustin Barrilleaux",email:"dustin.barrilleaux@leaseend.com"},
+  {name:"Nermin Bektic",email:"nermin.bektic@leaseend.com"},
+  {name:"Madeline Birtcher",email:"madeline.birtcher@leaseend.com"},
+  {name:"Daniel Bjornn",email:"dan.bjornn@leaseend.com"},
+  {name:"Jaden Blacker",email:"jaden.blacker@leaseend.com"},
+  {name:"Jenna Blacker",email:"jenna.blacker@leaseend.com"},
+  {name:"Kyle Boblett",email:"kyle.boblett@leaseend.com"},
+  {name:"Tanner Bodily",email:"tanner.bodily@leaseend.com"},
+  {name:"Persephone Bohon",email:"percy.monson@leaseend.com"},
+  {name:"Michael Bradshaw",email:"michael.bradshaw@leaseend.com"},
+  {name:"Fidel Bravo",email:"fidel.bravo@leaseend.com"},
+  {name:"Hunter Breshears",email:"hunter.breshears@leaseend.com"},
+  {name:"Benjamin Briten",email:"ben.briten@leaseend.com"},
+  {name:"Adam Broud",email:"adam.broud@leaseend.com"},
+  {name:"Lindsey Broud",email:"lindsey.broud@leaseend.com"},
+  {name:"Marisa Bruce",email:"marisa.bruce@leaseend.com"},
+  {name:"Jon Brusch",email:"jon.brusch@leaseend.com"},
+  {name:"Katelyn Call",email:"katelyn.call@leaseend.com"},
+  {name:"Lizbeth Calvillo",email:"lizbeth.calvillo@leaseend.com"},
+  {name:"Veronica Campos",email:"veronica.campos@leaseend.com"},
+  {name:"Gabriel Cano",email:"gabriel.cano@leaseend.com"},
+  {name:"Yadira Castillo",email:"yadira.castillo@leaseend.com"},
+  {name:"Amelia Chacon",email:"amelia.chacon@leaseend.com"},
+  {name:"Lexus Chavez",email:"lexus.salinas@leaseend.com"},
+  {name:"Lilianah Chavez",email:"lily.chavez@leaseend.com"},
+  {name:"Easton Christiansen",email:"easton.christiansen@leaseend.com"},
+  {name:"Kellen Christiansen",email:"kellen.christiansen@leaseend.com"},
+  {name:"Austin Chugg",email:"austin.chugg@leaseend.com"},
+  {name:"Cameron Clark",email:"cameron.clark@leaseend.com"},
+  {name:"Lautaro Colazo",email:"lautaro.colazo@leaseend.com"},
+  {name:"Jeremy Conterio",email:"jeremy.conterio@leaseend.com"},
+  {name:"Kylen Conterio",email:"kylie.conterio@leaseend.com"},
+  {name:"David Cook",email:"david.cook@leaseend.com"},
+  {name:"Forrest Cook",email:"chip.cook@leaseend.com"},
+  {name:"Matt Cook",email:"mattcook@goodemotor.com"},
+  {name:"Steven Cook",email:"zander@leaseend.com"},
+  {name:"Dominique Coon",email:"dominique.coon@leaseend.com"},
+  {name:"Frank Corbett",email:"frank.corbett@leaseend.com"},
+  {name:"Samuel Corbett",email:"samuel.corbett@leaseend.com"},
+  {name:"Joshua Cruz",email:"joshua.cruz@leaseend.com"},
+  {name:"Ian Cuillard",email:"ian.cuillard@leaseend.com"},
+  {name:"Bradie Dains",email:"bradie.olsen@leaseend.com"},
+  {name:"Katherine Davidson",email:"katie.davidson@leaseend.com"},
+  {name:"Brennen Davis",email:"brennen.davis@leaseend.com"},
+  {name:"Evan Davis",email:"evan.davis@leaseend.com"},
+  {name:"Malia Davis",email:"malia.davis@leaseend.com"},
+  {name:"Edin Dzindo",email:"edin.dzindo@leaseend.com"},
+  {name:"William Edwards",email:"dax.edwards@leaseend.com"},
+  {name:"Nicholis Egbert",email:"nicholis.egbert@leaseend.com"},
+  {name:"Davis England",email:"davis.england@leaseend.com"},
+  {name:"Houston Ewing",email:"houston.ewing@leaseend.com"},
+  {name:"Carli Fairchild",email:"carli.fairchild@leaseend.com"},
+  {name:"Paytan Fairchild",email:"paytan.fairchild@leaseend.com"},
+  {name:"Jasmin Fedaie",email:"jasmin.fedaie@leaseend.com"},
+  {name:"Joshua Ferry",email:"joshua.ferry@leaseend.com"},
+  {name:"Nicholas Filetti",email:"hayden.filetti@leaseend.com"},
+  {name:"Kyle Fowers",email:"kyle.fowers@leaseend.com"},
+  {name:"Saran Garcia",email:"saran.garcia@leaseend.com"},
+  {name:"Jacob Garner",email:"jacob.garner@leaseend.com"},
+  {name:"Brian Garstka",email:"brian.garstka@leaseend.com"},
+  {name:"Avery Giles",email:"avery.giles@leaseend.com"},
+  {name:"Alexis Gilliam",email:"alexis.gilliam@leaseend.com"},
+  {name:"Bentley Glover",email:"bentley.glover@leaseend.com"},
+  {name:"Trevor Gosar",email:"trevor.gosar@leaseend.com"},
+  {name:"Rebecca Graham",email:"rebecca.graham@leaseend.com"},
+  {name:"Laci Greene",email:"laci.greene@leaseend.com"},
+  {name:"Colton Griffith",email:"colton.griffith@leaseend.com"},
+  {name:"Natassja Grossman",email:"natassja.grossman@leaseend.com"},
+  {name:"Matteo Guerrieri",email:"matteo.guerrieri@leaseend.com"},
+  {name:"Leigha Gutierrez",email:"leigha.gutierrez@leaseend.com"},
+  {name:"Vanessa Gutierrez",email:"vanessa.rizo@leaseend.com"},
+  {name:"Taylour Hanson",email:"taylour.hanson@leaseend.com"},
+  {name:"Dallin Hatch",email:"dallin.hatch@leaseend.com"},
+  {name:"Jonathan Hernandez",email:"jonathan.hernandez@leaseend.com"},
+  {name:"Carson Hoch",email:"carson.hoch@leaseend.com"},
+  {name:"Rylie Hockenbury",email:"rylie.hockenbury@leaseend.com"},
+  {name:"Ryan Horton",email:"ryan.horton@leaseend.com"},
+  {name:"Andy Huerta",email:"andy.huerta@leaseend.com"},
+  {name:"Diego Ibarra",email:"diego.ibarra@leaseend.com"},
+  {name:"Parker Jackson",email:"parker.jackson@leaseend.com"},
+  {name:"Samuel Jaggi",email:"samuel.jaggi@leaseend.com"},
+  {name:"Cory Jeffs",email:"cory.jeffs@leaseend.com"},
+  {name:"Andrew Jensen",email:"andrew.jensen@leaseend.com"},
+  {name:"Kayla Jensen",email:"kayla.jensen@leaseend.com"},
+  {name:"Nathan Jensen",email:"nate.jensen@leaseend.com"},
+  {name:"Garret Joiret",email:"garret.joiret@leaseend.com"},
+  {name:"Olivia Jones",email:"olivia.jones@leaseend.com"},
+  {name:"Arlette Juarez",email:"arlette.juarez@leaseend.com"},
+  {name:"Cesar Juarez",email:"cesar.juarez@leaseend.com"},
+  {name:"Felisha Juarez",email:"felisha.aguinaga@leaseend.com"},
+  {name:"Isela Juarez",email:"isela.juarez@leaseend.com"},
+  {name:"Raquel Juarez",email:"raquel.juarez@leaseend.com"},
+  {name:"Yesenia Juarez",email:"yesenia.juarez@leaseend.com"},
+  {name:"Ryan Kesler",email:"ryan.kelser@leaseend.com"},
+  {name:"Mobina Khazei",email:"mobina.khazei@leaseend.com"},
+  {name:"Creighton King",email:"creighton.king@leaseend.com"},
+  {name:"Nathaniel Kirk",email:"nathan.kirk@leaseend.com"},
+  {name:"Jordan Knudsen",email:"jordan.knudsen@leaseend.com"},
+  {name:"Hanna Kolsen",email:"hanna.kolsen@leaseend.com"},
+  {name:"Aidan Kuhlman",email:"aidan.kuhlman@leaseend.com"},
+  {name:"Joshua Kuhn",email:"joshua.kuhn@leaseend.com"},
+  {name:"Harrison Larsen",email:"harrison.larsen@leaseend.com"},
+  {name:"Owen Larson",email:"owen.larson@leaseend.com"},
+  {name:"Kira Laub",email:"kira.laub@leaseend.com"},
+  {name:"Nathaniel Leishman",email:"nathaniel.leishman@leaseend.com"},
+  {name:"Devin Lethbridge",email:"devin.lethbridge@leaseend.com"},
+  {name:"Brady Lewis",email:"brady.lewis@leaseend.com"},
+  {name:"Caleb Loveland",email:"caleb.loveland@leaseend.com"},
+  {name:"Christian Luiten",email:"christian.luiten@leaseend.com"},
+  {name:"Ryan Madsen",email:"ryan.madsen@leaseend.com"},
+  {name:"Matthew Mahony",email:"matthew.mahony@leaseend.com"},
+  {name:"Aliya Maldonado",email:"aliya.maldonado@leaseend.com"},
+  {name:"Dixie Mann",email:"dixie.mann@leaseend.com"},
+  {name:"Zachary Martin",email:"zach.martin@leaseend.com"},
+  {name:"Jonathan Martinez",email:"jonathan.martinez@leaseend.com"},
+  {name:"Julissa Martinez",email:"julissa.martinez@leaseend.com"},
+  {name:"Katelyn Mayner",email:"katelyn.mayner@leaseend.com"},
+  {name:"Kiera Mcguire",email:"kiera.mcguire@leaseend.com"},
+  {name:"Misty McKenzie",email:"misty.mckenzie@leaseend.com"},
+  {name:"Preston McPheters",email:"preston.mcpheters@leaseend.com"},
+  {name:"RoAnne Mediati",email:"roanne.mediati@leaseend.com"},
+  {name:"Jacob Meiners",email:"jake.meiners@leaseend.com"},
+  {name:"Vanessa Mercado",email:"vanessa.mercado@leaseend.com"},
+  {name:"Schylar Mills",email:"schylar.mills@leaseend.com"},
+  {name:"Kevin Millward",email:"kevin.millward@leaseend.com"},
+  {name:"Jera Mitchell",email:"jera.mitchell@leaseend.com"},
+  {name:"London Mitchell",email:"london.mitchell@leaseend.com"},
+  {name:"Kendra Molina-Lacy",email:"kendra.molina-lacy@leaseend.com"},
+  {name:"Destiny Nelson",email:"destiny.nelson@leaseend.com"},
+  {name:"Bryce Nicoll",email:"bryce.nicoll@leaseend.com"},
+  {name:"Christian Nielsen",email:"christian.nielsen@leaseend.com"},
+  {name:"Dustin Nielsen",email:"dustin.nielsen@leaseend.com"},
+  {name:"Kambren Nielson",email:"kambren.nielson@leaseend.com"},
+  {name:"Uela Nifo",email:"uela.nifo@leaseend.com"},
+  {name:"Michael O'Brien",email:"michael.obrien@leaseend.com"},
+  {name:"Jacoby O'Connell",email:"jacoby.oconnell@leaseend.com"},
+  {name:"Esau Ocrospoma",email:"esau.ocrospoma@leaseend.com"},
+  {name:"Guadalupe Ornelas",email:"guadalupe.ornelas@leaseend.com"},
+  {name:"Kearra Orth",email:"kearra.orth@leaseend.com"},
+  {name:"Trevor Patten",email:"trevor.patten@leaseend.com"},
+  {name:"Zavian Pelayo",email:"zavian.pelayo@leaseend.com"},
+  {name:"Emily Pena-Gil",email:"emily.pena@leaseend.com"},
+  {name:"Bradley Perkins",email:"brad.perkins@leaseend.com"},
+  {name:"Kevin Perkins",email:"kevin.perkins@leaseend.com"},
+  {name:"John Petitta",email:"mckay.petitta@leaseend.com"},
+  {name:"Chase Pickett",email:"chase.pickett@leaseend.com"},
+  {name:"Ashley Pliler",email:"ashley.pliler@leaseend.com"},
+  {name:"Alishia Proctor",email:"alishia.proctor@leaseend.com"},
+  {name:"Joshua Putnam",email:"josh.putnam@leaseend.com"},
+  {name:"Angelica Quezada",email:"angelica.quezada@leaseend.com"},
+  {name:"Christine Rallison",email:"christine.rallison@leaseend.com"},
+  {name:"Randy Ramirez",email:"randy.ramirez@leaseend.com"},
+  {name:"Yesenia Ramirez",email:"yesenia.ramirez@leaseend.com"},
+  {name:"Emily Rasmussen",email:"emily.rasmussen@leaseend.com"},
+  {name:"Gary Rasmussen",email:"gary.rasmussen@leaseend.com"},
+  {name:"Haleigh Rasmussen",email:"haleigh.rasmussen@leaseend.com"},
+  {name:"Sadie Rasmussen",email:"sadie.rasmussen@leaseend.com"},
+  {name:"Jaunette Reyes",email:"jaunette.martinez-barajas@leaseend.com"},
+  {name:"Owen Reynolds",email:"owen.reynolds@leaseend.com"},
+  {name:"Kelsie Richardson",email:"kelsie.pope@leaseend.com"},
+  {name:"Rosio Rivera",email:"rosie.ramirez@leaseend.com"},
+  {name:"Franklin Rizo",email:"franklin.rizo@leaseend.com"},
+  {name:"Zach Roberts",email:"zachery.roberts@leaseend.com"},
+  {name:"Joseph Rose",email:"joe.rose@leaseend.com"},
+  {name:"Kathryn Sabersky",email:"kvrs@leaseend.com"},
+  {name:"Melissa Salinas",email:"melissa.salinas@leaseend.com"},
+  {name:"Eduardo Sanchez",email:"eduardo.sanchez@leaseend.com"},
+  {name:"Sara Schafer",email:"sara.schafer@leaseend.com"},
+  {name:"Zackery Schrenk",email:"zackery.schrenk@leaseend.com"},
+  {name:"Gregory Secrist",email:"gregory.secrist@leaseend.com"},
+  {name:"Brayden Shoemaker",email:"brayden.shoemaker@leaseend.com"},
+  {name:"Tanner Sillito",email:"tanner.sillito@leaseend.com"},
+  {name:"Pablo Silvaz",email:"pablo.silvaz@goodemotor.com"},
+  {name:"Caleb Smith",email:"caleb.smith@leaseend.com"},
+  {name:"Ryan Smith",email:"boomer.smith@leaseend.com"},
+  {name:"Benjamin Smyer",email:"teague.smyer@leaseend.com"},
+  {name:"Nicholas Snelson",email:"nick.snelson@leaseend.com"},
+  {name:"Matthew Sommercorn",email:"matthew.sommercorn@leaseend.com"},
+  {name:"Daniel Spencer",email:"daniel.spencer@leaseend.com"},
+  {name:"Jade Spencer",email:"jade.spencer@leaseend.com"},
+  {name:"Malibu Sprinkle",email:"malibu.sprinkle@leaseend.com"},
+  {name:"Mark Stahmann",email:"mark.stahmann@leaseend.com"},
+  {name:"Haylee Stalions",email:"haylee.stalions@leaseend.com"},
+  {name:"Kjell Stamminger",email:"kjell.stamminger@leaseend.com"},
+  {name:"Jill Stellingwerf",email:"jill.stellingwerf@leaseend.com"},
+  {name:"Brynne Stenovich",email:"brynne.stenovich@leaseend.com"},
+  {name:"Evan Stone",email:"evan.stone@leaseend.com"},
+  {name:"Sterling Strickland",email:"sterling.strickland@leaseend.com"},
+  {name:"James Takacs",email:"james.takacs@leaseend.com"},
+  {name:"Landon Talbot",email:"landon.talbot@leaseend.com"},
+  {name:"Jack Tanis",email:"jack.tanis@leaseend.com"},
+  {name:"Jacob Telles",email:"jacob.telles@leaseend.com"},
+  {name:"David Ten",email:"david.ten@leaseend.com"},
+  {name:"Mercedes Tena",email:"mercedes.tena@leaseend.com"},
+  {name:"Dorothy Thaxton",email:"lynnete.thaxton@leaseend.com"},
+  {name:"Amanda Tilley",email:"amanda.tilley@leaseend.com"},
+  {name:"Ashley Tilley",email:"ashley.tilley@leaseend.com"},
+  {name:"Rayce Tohara",email:"rayce.tohara@leaseend.com"},
+  {name:"Rylee Tomicic",email:"rylee.pizzi@leaseend.com"},
+  {name:"Jeremy Toner",email:"jeremy@leaseend.com"},
+  {name:"Teeghan Turner",email:"teeghan.turner@leaseend.com"},
+  {name:"Nina Twitchell",email:"nina.twitchell@leaseend.com"},
+  {name:"Erick Vega",email:"erick.vega@leaseend.com"},
+  {name:"Julie Vosdoganis",email:"julie.vosdoganis@leaseend.com"},
+  {name:"Dalton Wallace",email:"dalton.wallace@leaseend.com"},
+  {name:"Gavin Welch",email:"gavin.welch@leaseend.com"},
+  {name:"Kyle Whitchurch",email:"kyle.whitchurch@leaseend.com"},
+  {name:"Audrey Williams",email:"audreyannawilliams@gmail.com"},
+  {name:"Brandon Williams",email:"bw@leaseend.com"},
+  {name:"Corbin Williams",email:"corbin@leaseend.com"},
+  {name:"David Williams",email:"dave@leaseend.com"},
+  {name:"Garth Williams",email:"garth@goodemotor.com"},
+  {name:"Jesse Williams",email:"jesse.williams@leaseend.com"},
+  {name:"Jessica Wilson",email:"jessica.wilson@leaseend.com"},
+  {name:"Ashley Wimmer",email:"ashley.wimmer@leaseend.com"},
+  {name:"James Wirthlin",email:"james.wirthlin@leaseend.com"},
+  {name:"Craig Wright",email:"craig.wright@leaseend.com"},
+  {name:"Chase Zundel",email:"chase.zundel@leaseend.com"},
+];
+</script>
+</body>
+</html>

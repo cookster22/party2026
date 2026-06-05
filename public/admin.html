@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Party Admin — Check-in Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a120b; color: #f5ece0; min-height: 100vh; }
+
+    /* PASSWORD GATE */
+    #gate { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    #gate .card { background: #2a1a0e; border: 1px solid #4a3020; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 360px; text-align: center; }
+    #gate h2 { color: #f5d080; font-size: 1.4rem; margin-bottom: 6px; }
+    #gate p { color: #9a8060; font-size: 0.88rem; margin-bottom: 24px; }
+    #gate input { width: 100%; padding: 14px 18px; font-size: 1rem; border-radius: 10px; border: 2px solid #4a3020; background: #1a120b; color: #f5ece0; outline: none; margin-bottom: 12px; text-align: center; letter-spacing: 0.15em; }
+    #gate input:focus { border-color: #b8860b; }
+    #gate button { width: 100%; padding: 15px; font-size: 1rem; font-weight: 700; background: #b8860b; color: #1a120b; border: none; border-radius: 10px; cursor: pointer; }
+    #gate .err { color: #ff8070; font-size: 0.85rem; margin-top: 8px; }
+
+    /* MAIN APP */
+    #app { display: none; }
+
+    /* NAV */
+    .nav { background: #120d07; border-bottom: 2px solid #3a2510; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 100; }
+    .nav-left { display: flex; gap: 4px; }
+    .nav a { display: inline-block; padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #8a7060; text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .nav a.active { color: #f5d080; border-bottom-color: #b8860b; }
+    .nav-logo { height: 28px; border-radius: 5px; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .logout-btn { font-size: 0.78rem; color: #6a5040; cursor: pointer; padding: 4px 8px; }
+
+    /* STATS */
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px; justify-content: center; background: #120d07; border-bottom: 1px solid #3a2510; }
+    .stat { background: #2a1a0e; border: 1px solid #3a2510; border-radius: 10px; padding: 12px 20px; text-align: center; min-width: 100px; flex: 1; max-width: 160px; }
+    .stat .num { font-size: 1.8rem; font-weight: 800; }
+    .stat .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #7a6050; margin-top: 2px; }
+    .stat.green .num { color: #90ee90; }
+    .stat.amber .num { color: #ffd060; }
+    .stat.blue .num { color: #87ceeb; }
+    .stat.gold .num { color: #f5d080; }
+
+    /* PROGRESS BAR */
+    .progress-wrap { padding: 0 16px 12px; background: #120d07; }
+    .progress-bar { height: 6px; background: #3a2510; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #4caf50; border-radius: 3px; transition: width 0.5s; }
+    .progress-label { font-size: 0.75rem; color: #7a6050; text-align: right; margin-top: 4px; }
+
+    /* TOOLBAR */
+    .toolbar { padding: 12px 16px; display: flex; gap: 10px; align-items: center; background: #1a120b; border-bottom: 1px solid #2a1a0e; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; }
+    .search-wrap input { width: 100%; padding: 10px 36px 10px 14px; font-size: 0.95rem; border-radius: 8px; border: 2px solid #3a2510; background: #2a1a0e; color: #f5ece0; outline: none; }
+    .search-wrap input:focus { border-color: #b8860b; }
+    .search-wrap input::placeholder { color: #5a4030; }
+    .filter-btns { display: flex; gap: 6px; }
+    .filter-btn { padding: 8px 14px; font-size: 0.8rem; font-weight: 600; border-radius: 8px; border: 1px solid #3a2510; background: #2a1a0e; color: #9a8060; cursor: pointer; white-space: nowrap; }
+    .filter-btn.active { background: rgba(184,134,11,0.15); border-color: #b8860b; color: #f5d080; }
+    .export-btn { padding: 8px 16px; font-size: 0.82rem; font-weight: 600; border-radius: 8px; border: 1px solid #4a3020; background: #2a1a0e; color: #c9a96e; cursor: pointer; white-space: nowrap; }
+    .export-btn:hover { background: rgba(184,134,11,0.1); }
+
+    /* GUEST LIST */
+    .guest-list { padding: 0 16px 80px; }
+    .last-letter { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: #5a4030; padding: 14px 4px 6px; font-weight: 700; border-bottom: 1px solid #2a1a0e; margin-bottom: 4px; }
+
+    .guest-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 12px; border-radius: 10px; margin-bottom: 4px;
+      border: 1px solid transparent; transition: background 0.15s;
+    }
+    .guest-row.checked { background: rgba(60,160,60,0.08); border-color: rgba(80,180,80,0.2); }
+    .guest-row:hover { background: rgba(184,134,11,0.07); }
+
+    .guest-name { flex: 1; font-weight: 600; font-size: 0.95rem; color: #f5ece0; }
+    .guest-name.checked { color: #90ee90; }
+    .guest-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .badge-vip { background: #b8860b; color: #1a120b; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
+    .badge-time { font-size: 0.72rem; color: #6a8060; }
+    .badge-plusone { font-size: 0.72rem; color: #87ceeb; }
+
+    .checkin-btn {
+      padding: 8px 14px; font-size: 0.82rem; font-weight: 700;
+      border-radius: 8px; border: none; cursor: pointer; white-space: nowrap;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    .checkin-btn.not-checked { background: rgba(184,134,11,0.15); color: #f5d080; border: 1px solid rgba(184,134,11,0.4); }
+    .checkin-btn.not-checked:hover { background: rgba(184,134,11,0.3); }
+    .checkin-btn.is-checked { background: rgba(60,160,60,0.15); color: #90ee90; border: 1px solid rgba(80,180,80,0.3); }
+    .checkin-btn.is-checked:hover { background: rgba(180,60,30,0.2); color: #ff8070; border-color: rgba(200,80,50,0.4); }
+    .checkin-btn.is-checked:hover::after { content: ' Undo'; }
+
+    .plusone-toggle {
+      padding: 6px 10px; font-size: 0.78rem; border-radius: 6px;
+      border: 1px solid #3a2510; background: #2a1a0e; color: #7a6050;
+      cursor: pointer; flex-shrink: 0; transition: all 0.15s; white-space: nowrap;
+    }
+    .plusone-toggle.has-plusone { background: rgba(135,206,235,0.1); border-color: rgba(135,206,235,0.3); color: #87ceeb; }
+
+    .no-results { text-align: center; padding: 48px 20px; color: #5a4030; font-style: italic; }
+    mark { background: rgba(184,134,11,0.35); color: inherit; border-radius: 2px; }
+
+    /* Sync indicator */
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #4a3020; display: inline-block; margin-right: 6px; }
+    .sync-dot.live { background: #4caf50; }
+    .sync-label { font-size: 0.72rem; color: #5a4030; }
+  </style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate">
+  <div class="card">
+    <img src="/le-logo.png" style="width:48px;border-radius:10px;margin-bottom:16px;">
+    <h2>Staff Check-in</h2>
+    <p>Enter the staff password to access the check-in dashboard</p>
+    <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')doAuth()">
+    <button onclick="doAuth()">Enter →</button>
+    <div class="err" id="authErr"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="/index.html">🏨 Hotel</a>
+      <a href="/waivers.html">📋 Waivers</a>
+      <a href="/admin.html" class="active">✅ Check-in</a>
+    </div>
+    <div class="nav-right">
+      <span class="sync-dot" id="syncDot"></span><span class="sync-label" id="syncLabel">Loading…</span>
+      <img src="/le-logo.png" class="nav-logo" alt="LE">
+    </div>
+  </nav>
+
+  <div class="stats" id="statsBar">
+    <div class="stat green"><div class="num" id="sCheckedIn">–</div><div class="lbl">Checked In</div></div>
+    <div class="stat amber"><div class="num" id="sRemaining">–</div><div class="lbl">Still Coming</div></div>
+    <div class="stat blue"><div class="num" id="sPlusOnes">–</div><div class="lbl">+1s</div></div>
+    <div class="stat gold"><div class="num" id="sTotalBodies">–</div><div class="lbl">Total Bodies</div></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">0% arrived</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Search by name…" oninput="renderList()" autocomplete="off">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('in',this)">✅ In</button>
+      <button class="filter-btn" onclick="setFilter('out',this)">⏳ Not In</button>
+    </div>
+    <button class="export-btn" onclick="doExport()">Export CSV</button>
+  </div>
+
+  <div class="guest-list" id="guestList"></div>
+</div>
+
+<script>
+const TOKEN = 'le-party-2026';
+let guests = [];
+let filter = 'all';
+let token = null;
+
+async function doAuth() {
+  const pw = document.getElementById('pwInput').value;
+  const r = await fetch('/api/auth', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ password: pw })
+  });
+  const d = await r.json();
+  if (d.token) {
+    token = d.token;
+    localStorage.setItem('party_token', token);
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    startPolling();
+  } else {
+    document.getElementById('authErr').textContent = 'Wrong password.';
+  }
+}
+
+// Auto-login if token stored
+window.addEventListener('DOMContentLoaded', () => {
+  const stored = localStorage.getItem('party_token');
+  if (stored) {
+    token = stored;
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    startPolling();
+  }
+  document.getElementById('pwInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doAuth();
+  });
+});
+
+async function fetchGuests() {
+  const r = await fetch('/api/guests', { headers: { 'x-admin-token': token } });
+  if (r.status === 401) { logout(); return; }
+  const d = await r.json();
+  guests = (d.guests || []).sort((a,b) => {
+    const la = a.name.split(' ').pop().toLowerCase();
+    const lb = b.name.split(' ').pop().toLowerCase();
+    return la.localeCompare(lb);
+  });
+  updateStats();
+  renderList();
+  document.getElementById('syncDot').className = 'sync-dot live';
+  document.getElementById('syncLabel').textContent = 'Live · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+function startPolling() {
+  fetchGuests();
+  setInterval(fetchGuests, 3000);
+}
+
+function updateStats() {
+  const checkedIn = guests.filter(g => g.checkedIn).length;
+  const remaining = guests.length - checkedIn;
+  const plusOnes  = guests.filter(g => g.checkedIn && g.plusOne).length;
+  const total     = checkedIn + plusOnes;
+  const pct       = guests.length ? Math.round(checkedIn / guests.length * 100) : 0;
+  document.getElementById('sCheckedIn').textContent   = checkedIn;
+  document.getElementById('sRemaining').textContent   = remaining;
+  document.getElementById('sPlusOnes').textContent    = plusOnes;
+  document.getElementById('sTotalBodies').textContent = total;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${pct}% arrived (${checkedIn} of ${guests.length})`;
+}
+
+function setFilter(f, el) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function hl(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let list = guests.filter(g => {
+    if (q && !g.name.toLowerCase().includes(q)) return false;
+    if (filter === 'in' && !g.checkedIn) return false;
+    if (filter === 'out' && g.checkedIn) return false;
+    return true;
+  });
+
+  const container = document.getElementById('guestList');
+  if (!list.length) { container.innerHTML = '<div class="no-results">No guests found.</div>'; return; }
+
+  let html = '';
+  let lastLetter = '';
+  list.forEach(g => {
+    const lastName = g.name.split(' ').pop();
+    const letter = lastName[0].toUpperCase();
+    if (letter !== lastLetter && !q) {
+      html += `<div class="last-letter">${letter}</div>`;
+      lastLetter = letter;
+    }
+    const time = g.checkedInAt ? new Date(g.checkedInAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
+    html += `
+      <div class="guest-row ${g.checkedIn ? 'checked' : ''}" id="row-${g.email.replace(/[@.]/g,'-')}">
+        <div>
+          <div class="guest-name ${g.checkedIn ? 'checked' : ''}">${hl(g.name, q)}</div>
+          <div class="guest-badges">
+            ${g.vip ? '<span class="badge-vip">⭐ VIP</span>' : ''}
+            ${g.checkedIn && time ? `<span class="badge-time">${time}${g.method==='self'?' · self':' · staff'}</span>` : ''}
+            ${g.plusOne ? '<span class="badge-plusone">+1 ✓</span>' : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+          <button class="plusone-toggle ${g.plusOne?'has-plusone':''}"
+            onclick="togglePlusOne('${g.email}', ${!g.plusOne})">
+            ${g.plusOne ? '+1 ✓' : '+1'}
+          </button>
+          <button class="checkin-btn ${g.checkedIn?'is-checked':'not-checked'}"
+            onclick="toggleCheckin('${g.email}', ${!g.checkedIn})">
+            ${g.checkedIn ? '✅ In' : 'Check In'}
+          </button>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+async function toggleCheckin(email, value) {
+  await fetch('/api/checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+    body: JSON.stringify({ email, value })
+  });
+  const g = guests.find(x => x.email === email);
+  if (g) { g.checkedIn = value; g.checkedInAt = value ? new Date().toISOString() : null; g.method = 'manual'; }
+  updateStats(); renderList();
+}
+
+async function togglePlusOne(email, value) {
+  await fetch('/api/plusone', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+    body: JSON.stringify({ email, value })
+  });
+  const g = guests.find(x => x.email === email);
+  if (g) g.plusOne = value;
+  updateStats(); renderList();
+}
+
+function doExport() {
+  window.open('/api/export?token=' + token, '_blank');
+}
+
+function logout() {
+  localStorage.removeItem('party_token');
+  location.reload();
+}
+</script>
+</body>
+</html>

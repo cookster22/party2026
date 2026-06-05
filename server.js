@@ -474,9 +474,389 @@ async function getWaivers() {
   return waiverCache;
 }
 
+// ── Check-in system ──────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'party';
+const ADMIN_TOKEN    = 'le-party-2026';
+const CHECKIN_FILE   = path.join(__dirname, 'checkin_state.json');
+
+// Master guest list seeded from RSVP CSV
+const GUEST_LIST = [
+  {name:"Gianfranco Aciego",email:"gianfranco.aciego@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ethan Aguinaga",email:"ethan.aguinaga@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jaime Alamillo",email:"jaime.alamillo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Aaron Albrechtsen",email:"aaron.albrechtsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Burke Alder",email:"burke.alder@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Easton Anderson",email:"easton.anderson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Julie Anderson",email:"julie.anderson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rhett Anderson",email:"rhett.anderson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dallas Andrade",email:"dallas.andrade@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Brenda Arambula",email:"brenda.arambula@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Carlee Arthur",email:"carlee.hellstrom@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Zach Baker",email:"zach.baker@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Austin Bakker",email:"austin.bakker@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Shane Ball",email:"shane.ball@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dustin Barrilleaux",email:"dustin.barrilleaux@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nermin Bektic",email:"nermin.bektic@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Madeline Birtcher",email:"madeline.birtcher@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Daniel Bjornn",email:"dan.bjornn@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jaden Blacker",email:"jaden.blacker@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jenna Blacker",email:"jenna.blacker@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kyle Boblett",email:"kyle.boblett@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Tanner Bodily",email:"tanner.bodily@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Persephone Bohon",email:"percy.monson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Michael Bradshaw",email:"michael.bradshaw@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Fidel Bravo",email:"fidel.bravo@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Hunter Breshears",email:"hunter.breshears@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Benjamin Briten",email:"ben.briten@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Adam Broud",email:"adam.broud@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Lindsey Broud",email:"lindsey.broud@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Marisa Bruce",email:"marisa.bruce@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jon Brusch",email:"jon.brusch@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Katelyn Call",email:"katelyn.call@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Lizbeth Calvillo",email:"lizbeth.calvillo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Veronica Campos",email:"veronica.campos@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Gabriel Cano",email:"gabriel.cano@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Yadira Castillo",email:"yadira.castillo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Amelia Chacon",email:"amelia.chacon@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Lexus Chavez",email:"lexus.salinas@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Lilianah Chavez",email:"lily.chavez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Easton Christiansen",email:"easton.christiansen@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Kellen Christiansen",email:"kellen.christiansen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Austin Chugg",email:"austin.chugg@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Cameron Clark",email:"cameron.clark@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Lautaro Colazo",email:"lautaro.colazo@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Jeremy Conterio",email:"jeremy.conterio@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kylen Conterio",email:"kylie.conterio@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"David Cook",email:"david.cook@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Forrest Cook",email:"chip.cook@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Matt Cook",email:"mattcook@goodemotor.com",vip:true,plusoneRsvp:true},
+  {name:"Steven Cook",email:"zander@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Dominique Coon",email:"dominique.coon@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Frank Corbett",email:"frank.corbett@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Samuel Corbett",email:"samuel.corbett@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Joshua Cruz",email:"joshua.cruz@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ian Cuillard",email:"ian.cuillard@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Bradie Dains",email:"bradie.olsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Katherine Davidson",email:"katie.davidson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Brennen Davis",email:"brennen.davis@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Evan Davis",email:"evan.davis@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Malia Davis",email:"malia.davis@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Edin Dzindo",email:"edin.dzindo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"William Edwards",email:"dax.edwards@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nicholis Egbert",email:"nicholis.egbert@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Davis England",email:"davis.england@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Houston Ewing",email:"houston.ewing@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Carli Fairchild",email:"carli.fairchild@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Paytan Fairchild",email:"paytan.fairchild@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jasmin Fedaie",email:"jasmin.fedaie@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Joshua Ferry",email:"joshua.ferry@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Nicholas Filetti",email:"hayden.filetti@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kyle Fowers",email:"kyle.fowers@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Saran Garcia",email:"saran.garcia@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jacob Garner",email:"jacob.garner@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Brian Garstka",email:"brian.garstka@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Avery Giles",email:"avery.giles@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Alexis Gilliam",email:"alexis.gilliam@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Bentley Glover",email:"bentley.glover@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Trevor Gosar",email:"trevor.gosar@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rebecca Graham",email:"rebecca.graham@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Laci Greene",email:"laci.greene@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Colton Griffith",email:"colton.griffith@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Natassja Grossman",email:"natassja.grossman@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Matteo Guerrieri",email:"matteo.guerrieri@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Leigha Gutierrez",email:"leigha.gutierrez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Vanessa Gutierrez",email:"vanessa.rizo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Taylour Hanson",email:"taylour.hanson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dallin Hatch",email:"dallin.hatch@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Jonathan Hernandez",email:"jonathan.hernandez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Carson Hoch",email:"carson.hoch@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rylie Hockenbury",email:"rylie.hockenbury@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ryan Horton",email:"ryan.horton@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Andy Huerta",email:"andy.huerta@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Diego Ibarra",email:"diego.ibarra@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Parker Jackson",email:"parker.jackson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Samuel Jaggi",email:"samuel.jaggi@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Cory Jeffs",email:"cory.jeffs@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Andrew Jensen",email:"andrew.jensen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kayla Jensen",email:"kayla.jensen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nathan Jensen",email:"nate.jensen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Garret Joiret",email:"garret.joiret@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Olivia Jones",email:"olivia.jones@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Arlette Juarez",email:"arlette.juarez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Cesar Juarez",email:"cesar.juarez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Felisha Juarez",email:"felisha.aguinaga@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Isela Juarez",email:"isela.juarez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Raquel Juarez",email:"raquel.juarez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Yesenia Juarez",email:"yesenia.juarez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ryan Kesler",email:"ryan.kelser@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Mobina Khazei",email:"mobina.khazei@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Creighton King",email:"creighton.king@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nathaniel Kirk",email:"nathan.kirk@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jordan Knudsen",email:"jordan.knudsen@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Hanna Kolsen",email:"hanna.kolsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Aidan Kuhlman",email:"aidan.kuhlman@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Joshua Kuhn",email:"joshua.kuhn@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Harrison Larsen",email:"harrison.larsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Owen Larson",email:"owen.larson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kira Laub",email:"kira.laub@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nathaniel Leishman",email:"nathaniel.leishman@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Devin Lethbridge",email:"devin.lethbridge@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Brady Lewis",email:"brady.lewis@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Caleb Loveland",email:"caleb.loveland@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Christian Luiten",email:"christian.luiten@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ryan Madsen",email:"ryan.madsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Matthew Mahony",email:"matthew.mahony@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Aliya Maldonado",email:"aliya.maldonado@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dixie Mann",email:"dixie.mann@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Zachary Martin",email:"zach.martin@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jonathan Martinez",email:"jonathan.martinez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Julissa Martinez",email:"julissa.martinez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Katelyn Mayner",email:"katelyn.mayner@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kiera Mcguire",email:"kiera.mcguire@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Misty McKenzie",email:"misty.mckenzie@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Preston McPheters",email:"preston.mcpheters@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"RoAnne Mediati",email:"roanne.mediati@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jacob Meiners",email:"jake.meiners@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Vanessa Mercado",email:"vanessa.mercado@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Schylar Mills",email:"schylar.mills@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kevin Millward",email:"kevin.millward@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jera Mitchell",email:"jera.mitchell@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"London Mitchell",email:"london.mitchell@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kendra Molina-Lacy",email:"kendra.molina-lacy@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Destiny Nelson",email:"destiny.nelson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Bryce Nicoll",email:"bryce.nicoll@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Christian Nielsen",email:"christian.nielsen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dustin Nielsen",email:"dustin.nielsen@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Kambren Nielson",email:"kambren.nielson@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Uela Nifo",email:"uela.nifo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Michael O'Brien",email:"michael.obrien@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jacoby O'Connell",email:"jacoby.oconnell@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Esau Ocrospoma",email:"esau.ocrospoma@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Guadalupe Ornelas",email:"guadalupe.ornelas@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kearra Orth",email:"kearra.orth@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Trevor Patten",email:"trevor.patten@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Zavian Pelayo",email:"zavian.pelayo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Emily Pena-Gil",email:"emily.pena@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Bradley Perkins",email:"brad.perkins@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kevin Perkins",email:"kevin.perkins@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"John Petitta",email:"mckay.petitta@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Chase Pickett",email:"chase.pickett@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ashley Pliler",email:"ashley.pliler@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Alishia Proctor",email:"alishia.proctor@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Joshua Putnam",email:"josh.putnam@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Angelica Quezada",email:"angelica.quezada@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Christine Rallison",email:"christine.rallison@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Randy Ramirez",email:"randy.ramirez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Yesenia Ramirez",email:"yesenia.ramirez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Emily Rasmussen",email:"emily.rasmussen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Gary Rasmussen",email:"gary.rasmussen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Haleigh Rasmussen",email:"haleigh.rasmussen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Sadie Rasmussen",email:"sadie.rasmussen@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jaunette Reyes",email:"jaunette.martinez-barajas@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Owen Reynolds",email:"owen.reynolds@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kelsie Richardson",email:"kelsie.pope@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rosio Rivera",email:"rosie.ramirez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Franklin Rizo",email:"franklin.rizo@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Zach Roberts",email:"zachery.roberts@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Joseph Rose",email:"joe.rose@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Kathryn Sabersky",email:"kvrs@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Melissa Salinas",email:"melissa.salinas@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Eduardo Sanchez",email:"eduardo.sanchez@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Sara Schafer",email:"sara.schafer@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Zackery Schrenk",email:"zackery.schrenk@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Gregory Secrist",email:"gregory.secrist@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Brayden Shoemaker",email:"brayden.shoemaker@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Tanner Sillito",email:"tanner.sillito@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Pablo Silvaz",email:"pablo.silvaz@goodemotor.com",vip:false,plusoneRsvp:true},
+  {name:"Caleb Smith",email:"caleb.smith@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ryan Smith",email:"boomer.smith@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Benjamin Smyer",email:"teague.smyer@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nicholas Snelson",email:"nick.snelson@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Matthew Sommercorn",email:"matthew.sommercorn@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Daniel Spencer",email:"daniel.spencer@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jade Spencer",email:"jade.spencer@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Malibu Sprinkle",email:"malibu.sprinkle@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Mark Stahmann",email:"mark.stahmann@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Haylee Stalions",email:"haylee.stalions@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Kjell Stamminger",email:"kjell.stamminger@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jill Stellingwerf",email:"jill.stellingwerf@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Brynne Stenovich",email:"brynne.stenovich@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Evan Stone",email:"evan.stone@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Sterling Strickland",email:"sterling.strickland@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"James Takacs",email:"james.takacs@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Landon Talbot",email:"landon.talbot@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jack Tanis",email:"jack.tanis@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jacob Telles",email:"jacob.telles@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"David Ten",email:"david.ten@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Mercedes Tena",email:"mercedes.tena@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Dorothy Thaxton",email:"lynnete.thaxton@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Amanda Tilley",email:"amanda.tilley@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Ashley Tilley",email:"ashley.tilley@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rayce Tohara",email:"rayce.tohara@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Rylee Tomicic",email:"rylee.pizzi@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jeremy Toner",email:"jeremy@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Teeghan Turner",email:"teeghan.turner@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Nina Twitchell",email:"nina.twitchell@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Erick Vega",email:"erick.vega@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Julie Vosdoganis",email:"julie.vosdoganis@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Dalton Wallace",email:"dalton.wallace@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Gavin Welch",email:"gavin.welch@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Kyle Whitchurch",email:"kyle.whitchurch@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Audrey Williams",email:"audreyannawilliams@gmail.com",vip:false,plusoneRsvp:true},
+  {name:"Brandon Williams",email:"bw@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Corbin Williams",email:"corbin@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"David Williams",email:"dave@leaseend.com",vip:true,plusoneRsvp:true},
+  {name:"Garth Williams",email:"garth@goodemotor.com",vip:true,plusoneRsvp:true},
+  {name:"Jesse Williams",email:"jesse.williams@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Jessica Wilson",email:"jessica.wilson@leaseend.com",vip:false,plusoneRsvp:false},
+  {name:"Ashley Wimmer",email:"ashley.wimmer@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"James Wirthlin",email:"james.wirthlin@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Craig Wright",email:"craig.wright@leaseend.com",vip:false,plusoneRsvp:true},
+  {name:"Chase Zundel",email:"chase.zundel@leaseend.com",vip:false,plusoneRsvp:false},
+];
+
+// In-memory state: { [email]: { name, checkedIn, checkedInAt, plusOne, method } }
+let checkInState = {};
+try { checkInState = JSON.parse(fs.readFileSync(CHECKIN_FILE, 'utf8')); } catch(e) {}
+
+// Seed any guests not yet in state
+GUEST_LIST.forEach(g => {
+  const key = g.email.toLowerCase();
+  if (!checkInState[key]) {
+    checkInState[key] = { name: g.name, email: key, vip: g.vip, plusoneRsvp: g.plusoneRsvp, checkedIn: false, checkedInAt: null, plusOne: false, method: null };
+  }
+});
+
+// Auto-save every 30 seconds
+setInterval(() => {
+  fs.writeFile(CHECKIN_FILE, JSON.stringify(checkInState), () => {});
+}, 30000);
+
+function saveNow() {
+  fs.writeFileSync(CHECKIN_FILE, JSON.stringify(checkInState));
+}
+
+function isAdmin(req) {
+  return req.headers['x-admin-token'] === ADMIN_TOKEN;
+}
+
+function readBody(req) {
+  return new Promise(resolve => {
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => { try { resolve(JSON.parse(body)); } catch { resolve({}); } });
+  });
+}
+
+function json(res, data, status = 200) {
+  res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+  res.end(JSON.stringify(data));
+}
+
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
-  if (req.url === '/api/waivers') {
+  const urlObj = new URL(req.url, `http://localhost`);
+  const pathname = urlObj.pathname;
+
+  // CORS preflight
+  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+  // ── Admin auth ──
+  if (pathname === '/api/auth' && req.method === 'POST') {
+    const body = await readBody(req);
+    if (body.password === ADMIN_PASSWORD) {
+      return json(res, { token: ADMIN_TOKEN });
+    }
+    return json(res, { error: 'Wrong password' }, 401);
+  }
+
+  // ── Self check-in (public) ──
+  if (pathname === '/api/self-checkin' && req.method === 'POST') {
+    const { email } = await readBody(req);
+    const key = (email || '').trim().toLowerCase();
+    if (!key) return json(res, { error: 'Email required' }, 400);
+    const existing = checkInState[key];
+    if (!existing) return json(res, { error: 'not_found' }, 404);
+    if (existing.checkedIn) return json(res, { already: true, name: existing.name });
+    existing.checkedIn = true;
+    existing.checkedInAt = new Date().toISOString();
+    existing.method = 'self';
+    saveNow();
+    return json(res, { success: true, name: existing.name, vip: existing.vip });
+  }
+
+  // ── Get all guests + status (admin) ──
+  if (pathname === '/api/guests' && req.method === 'GET') {
+    if (!isAdmin(req)) return json(res, { error: 'Unauthorized' }, 401);
+    return json(res, { guests: Object.values(checkInState) });
+  }
+
+  // ── Manual check-in (admin) ──
+  if (pathname === '/api/checkin' && req.method === 'POST') {
+    if (!isAdmin(req)) return json(res, { error: 'Unauthorized' }, 401);
+    const { email, value } = await readBody(req);
+    const key = (email || '').trim().toLowerCase();
+    if (!checkInState[key]) return json(res, { error: 'not_found' }, 404);
+    checkInState[key].checkedIn = value !== false;
+    checkInState[key].checkedInAt = value !== false ? new Date().toISOString() : null;
+    checkInState[key].method = 'manual';
+    saveNow();
+    return json(res, { success: true });
+  }
+
+  // ── Toggle plus-one (admin) ──
+  if (pathname === '/api/plusone' && req.method === 'POST') {
+    if (!isAdmin(req)) return json(res, { error: 'Unauthorized' }, 401);
+    const { email, value } = await readBody(req);
+    const key = (email || '').trim().toLowerCase();
+    if (!checkInState[key]) return json(res, { error: 'not_found' }, 404);
+    checkInState[key].plusOne = value === true;
+    saveNow();
+    return json(res, { success: true });
+  }
+
+  // ── Self-service plus-one (after self check-in) ──
+  if (pathname === '/api/self-plusone' && req.method === 'POST') {
+    const { email, value } = await readBody(req);
+    const key = (email || '').trim().toLowerCase();
+    if (!checkInState[key]) return json(res, { error: 'not_found' }, 404);
+    checkInState[key].plusOne = value === true;
+    saveNow();
+    return json(res, { success: true });
+  }
+
+  // ── Stats (admin) ──
+  if (pathname === '/api/stats' && req.method === 'GET') {
+    if (!isAdmin(req)) return json(res, { error: 'Unauthorized' }, 401);
+    const all = Object.values(checkInState);
+    const checkedIn = all.filter(g => g.checkedIn).length;
+    const plusOnes  = all.filter(g => g.checkedIn && g.plusOne).length;
+    return json(res, {
+      total: all.length,
+      checkedIn,
+      remaining: all.length - checkedIn,
+      plusOnes,
+      totalBodies: checkedIn + plusOnes,
+    });
+  }
+
+  // ── Export CSV (admin) ──
+  if (pathname === '/api/export' && req.method === 'GET') {
+    const qToken = urlObj.searchParams.get('token');
+    if (!isAdmin(req) && qToken !== ADMIN_TOKEN) return json(res, { error: 'Unauthorized' }, 401);
+    const rows = ['Name,Email,VIP,Checked In,Plus One,Time,Method'];
+    Object.values(checkInState).sort((a,b) => a.name.localeCompare(b.name)).forEach(g => {
+      const t = g.checkedInAt ? new Date(g.checkedInAt).toLocaleTimeString('en-US') : '';
+      rows.push(`"${g.name}","${g.email}",${g.vip},${g.checkedIn},${g.plusOne},"${t}","${g.method||''}"`);
+    });
+    res.writeHead(200, {
+      'Content-Type': 'text/csv',
+      'Content-Disposition': 'attachment; filename="checkins.csv"',
+    });
+    return res.end(rows.join('\n'));
+  }
+
+  if (pathname === '/api/waivers') {
     try {
       const { map, guests } = await getWaivers();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
