@@ -713,6 +713,12 @@ const GUEST_LIST = [
   {name:"James Wirthlin",email:"james.wirthlin@leaseend.com",vip:false,plusoneRsvp:true},
   {name:"Craig Wright",email:"craig.wright@leaseend.com",vip:false,plusoneRsvp:true},
   {name:"Chase Zundel",email:"chase.zundel@leaseend.com",vip:false,plusoneRsvp:false},
+  // Sponsors / Partners
+  {name:"Tia Lyons",email:"tia.lyons@pnc.com",vip:false,plusoneRsvp:true,sponsor:true,sponsorOrg:"PNC Bank"},
+  {name:"Steve Sain",email:"steve.sain@ally.com",vip:false,plusoneRsvp:true,sponsor:true,sponsorOrg:"Ally Bank"},
+  {name:"Gregory Kropidlowski",email:"gregory.kropidlowski@td.com",vip:false,plusoneRsvp:true,sponsor:true,sponsorOrg:"TD Bank"},
+  {name:"Jaclyn Goddard",email:"jaclyng@consumerportfolio.com",vip:false,plusoneRsvp:true,sponsor:true,sponsorOrg:"CPS"},
+  {name:"Autumn McClain",email:"autumn.mcclain@capitalone.com",vip:false,plusoneRsvp:true,sponsor:true,sponsorOrg:"Capital One"},
 ];
 
 // In-memory state: { [email]: { name, checkedIn, checkedInAt, plusOne, method } }
@@ -723,7 +729,7 @@ try { checkInState = JSON.parse(fs.readFileSync(CHECKIN_FILE, 'utf8')); } catch(
 GUEST_LIST.forEach(g => {
   const key = g.email.toLowerCase();
   if (!checkInState[key]) {
-    checkInState[key] = { name: g.name, email: key, vip: g.vip, plusoneRsvp: g.plusoneRsvp, checkedIn: false, checkedInAt: null, plusOne: false, method: null };
+    checkInState[key] = { name: g.name, email: key, vip: g.vip, plusoneRsvp: g.plusoneRsvp, sponsor: g.sponsor || false, sponsorOrg: g.sponsorOrg || null, checkedIn: false, checkedInAt: null, plusOne: false, method: null };
   }
 });
 

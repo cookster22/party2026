@@ -101,6 +101,9 @@
 
     .badge-walkin { font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;
       background: rgba(120,80,200,0.2); border: 1px solid rgba(160,120,240,0.4); color: #c8a8ff; letter-spacing: 0.04em; }
+    .badge-sponsor { font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;
+      background: rgba(80,180,200,0.15); border: 1px solid rgba(100,200,220,0.4); color: #7de8f8; letter-spacing: 0.04em; }
+    .badge-sponsor-org { font-size: 0.68rem; color: #5a9aaa; font-style: italic; }
 
     /* Add Attendee button */
     .add-btn { padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border-radius: 8px;
@@ -359,7 +362,9 @@ function renderList() {
           <div class="guest-name ${g.checkedIn ? 'checked' : ''}">${hl(g.name, q)}</div>
           <div class="guest-badges">
             ${g.vip ? '<span class="badge-vip">⭐ VIP</span>' : ''}
+            ${g.sponsor ? `<span class="badge-sponsor">🤝 Sponsor/Partner</span>` : ''}
             ${g.walkin ? '<span class="badge-walkin">Walk-in</span>' : ''}
+            ${g.sponsor && g.sponsorOrg ? `<span class="badge-sponsor-org">${g.sponsorOrg}</span>` : ''}
             ${g.checkedIn && time ? `<span class="badge-time">${time}${g.method==='self'?' · self':g.method==='walkin'?' · walk-in':' · staff'}</span>` : ''}
             ${g.plusOne ? '<span class="badge-plusone">+1 ✓</span>' : ''}
           </div>
