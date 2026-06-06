@@ -206,6 +206,10 @@
       display: inline-block; background: rgba(135,206,235,0.1); border: 1px solid rgba(135,206,235,0.25);
       border-radius: 5px; padding: 2px 8px; font-size: 0.72rem; color: #87ceeb; white-space: nowrap;
     }
+    .type-family {
+      display: inline-block; background: rgba(180,120,220,0.12); border: 1px solid rgba(180,120,220,0.3);
+      border-radius: 5px; padding: 2px 8px; font-size: 0.72rem; color: #d4a8f0; white-space: nowrap;
+    }
     @media (max-width: 500px) {
       thead th:nth-child(2) { display: none; }
       tbody td:nth-child(2) { display: none; }
@@ -542,7 +546,7 @@ const PARTY = [
   ["Dalton","Wallace"],
   ["Gavin","Welch"],
   ["Kyle","Whitchurch"],
-  ["Audrey","Ramsey"],
+  ["Audrey","Ramsey","family"],
   ["Brandon","Williams"],
   ["Corbin","Williams"],
   ["David","Williams"],
@@ -606,7 +610,8 @@ function render(q) {
   filtered.forEach(([first, last, snow, buck, type]) => {
     const tr = document.createElement('tr');
     const typeBadge = type === 'employee'
-      ? '<span class="type-employee">Employee</span>'
+      === 'employee' ? '<span class="type-employee">Employee</span>'
+      : p[4] === 'family' ? '<span class="type-family">Family</span>'
       : '<span class="type-guest">Guest / +1</span>';
     tr.innerHTML = `
       <td class="name-cell">${highlight(`${first} ${last}`, q.trim())}</td>
@@ -645,10 +650,10 @@ fetch('/api/waivers')
   .then(r => r.json())
   .then(({ waivers: waiverMap, guests, updatedAt, source }) => {
     // Employees from PARTY list
-    const employees = PARTY.map(([first, last]) => {
+    const employees = PARTY.map(([first, last, overrideType]) => {
       const key = `${first} ${last}`.toLowerCase();
       const w = waiverMap[key] || { snow: 'none', buck: 'none' };
-      return [first, last, w.snow, w.buck, 'employee'];
+      return [first, last, w.snow, w.buck, overrideType || 'employee'];
     });
 
     // Guests / plus-ones from API
@@ -676,7 +681,7 @@ fetch('/api/waivers')
       : `Showing baseline data (no API key) — last checked ${ts}`;
   })
   .catch(() => {
-    PEOPLE = PARTY.map(([f, l]) => [f, l, 'none', 'none', 'employee']);
+    PEOPLE = PARTY.map(([f, l, t]) => [f, l, 'none', 'none', t || 'employee']);
     updateStats();
     render('');
     document.getElementById('apiDot').style.background = '#e53935';
