@@ -477,7 +477,8 @@ async function getWaivers() {
 // ── Check-in system ──────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = 'party';
 const ADMIN_TOKEN    = 'le-party-2026';
-const CHECKIN_FILE   = path.join(__dirname, 'checkin_state.json');
+const DATA_DIR       = process.env.DATA_DIR || __dirname;
+const CHECKIN_FILE   = path.join(DATA_DIR, 'checkin_state.json');
 
 // Master guest list seeded from RSVP CSV
 const GUEST_LIST = [
@@ -733,10 +734,10 @@ GUEST_LIST.forEach(g => {
   }
 });
 
-// Auto-save every 30 seconds
+// Auto-save every 10 seconds
 setInterval(() => {
   fs.writeFile(CHECKIN_FILE, JSON.stringify(checkInState), () => {});
-}, 30000);
+}, 10000);
 
 function saveNow() {
   fs.writeFileSync(CHECKIN_FILE, JSON.stringify(checkInState));
