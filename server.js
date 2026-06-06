@@ -743,6 +743,12 @@ function saveNow() {
   fs.writeFileSync(CHECKIN_FILE, JSON.stringify(checkInState));
 }
 
+function isCheckinOpen() {
+  // Opens at 6:50 PM Mountain Time (America/Denver)
+  const mt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
+  return mt.getHours() > 18 || (mt.getHours() === 18 && mt.getMinutes() >= 50);
+}
+
 function isAdmin(req) {
   return req.headers['x-admin-token'] === ADMIN_TOKEN;
 }
@@ -777,8 +783,14 @@ const server = http.createServer(async (req, res) => {
     return json(res, { error: 'Wrong password' }, 401);
   }
 
+  // ── Check-in window status (public) ──
+  if (pathname === '/api/checkin-status' && req.method === 'GET') {
+    return json(res, { open: isCheckinOpen() });
+  }
+
   // ── Self check-in (public) ──
   if (pathname === '/api/self-checkin' && req.method === 'POST') {
+    if (!isCheckinOpen()) return json(res, { error: 'not_open' }, 403);
     const { email } = await readBody(req);
     const key = (email || '').trim().toLowerCase();
     if (!key) return json(res, { error: 'Email required' }, 400);

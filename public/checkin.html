@@ -92,6 +92,16 @@
     .result-arrow { color: #6a5040; }
 
     .hidden { display: none !important; }
+
+    /* Not-yet-open screen */
+    .locked-screen { text-align: center; }
+    .locked-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .locked-title { font-size: 1.4rem; font-weight: 800; color: #f5d080; margin-bottom: 8px; }
+    .locked-sub { font-size: 0.95rem; color: #9a8060; margin-bottom: 28px; line-height: 1.6; }
+    .countdown { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
+    .cd-block { background: #1a120b; border: 1px solid #4a3020; border-radius: 10px; padding: 14px 18px; text-align: center; min-width: 64px; }
+    .cd-num { font-size: 2rem; font-weight: 900; color: #f5d080; line-height: 1; }
+    .cd-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #7a6050; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -100,8 +110,20 @@
   <h1>Welcome! 🤠</h1>
   <p class="subtitle">Lease End Party · Saturday, June 6</p>
 
+  <!-- Not yet open screen -->
+  <div class="card locked-screen hidden" id="lockedScreen">
+    <div class="locked-icon">🔒</div>
+    <div class="locked-title">Check-in Opens at 6:50 PM</div>
+    <div class="locked-sub">Head to Snowbasin and get ready to party.<br>Check-in will open right before the doors.</div>
+    <div class="countdown">
+      <div class="cd-block"><div class="cd-num" id="cdH">–</div><div class="cd-lbl">Hours</div></div>
+      <div class="cd-block"><div class="cd-num" id="cdM">–</div><div class="cd-lbl">Min</div></div>
+      <div class="cd-block"><div class="cd-num" id="cdS">–</div><div class="cd-lbl">Sec</div></div>
+    </div>
+  </div>
+
   <!-- Email check-in screen -->
-  <div class="card" id="emailScreen">
+  <div class="card hidden" id="emailScreen">
     <label for="emailInput">Your work email address</label>
     <input type="email" id="emailInput" placeholder="you@leaseend.com" autocomplete="email" autocorrect="off" autocapitalize="off" spellcheck="false">
     <div class="error-msg" id="emailError"></div>
@@ -147,9 +169,51 @@
   </div>
 
 <script>
-const GUESTS = [];  // populated from server
-
 let currentEmail = null;
+
+// ── Check-in gate ─────────────────────────────────────────────────────────
+const OPEN_TIME = new Date('2026-06-06T18:50:00');  // 6:50 PM MT (local device time used as fallback)
+
+async function checkGate() {
+  try {
+    const r = await fetch('/api/checkin-status');
+    const d = await r.json();
+    if (d.open) { openCheckin(); return; }
+  } catch(e) {
+    // Fallback: use device time
+    if (new Date() >= OPEN_TIME) { openCheckin(); return; }
+  }
+  showLocked();
+}
+
+function openCheckin() {
+  hide('lockedScreen');
+  show('emailScreen');
+}
+
+function showLocked() {
+  hide('emailScreen');
+  show('lockedScreen');
+  updateCountdown();
+  const timer = setInterval(() => {
+    // Re-check server every 30s so it opens automatically
+    fetch('/api/checkin-status').then(r => r.json()).then(d => {
+      if (d.open) { clearInterval(timer); openCheckin(); }
+    }).catch(() => {});
+    updateCountdown();
+  }, 1000);
+}
+
+function updateCountdown() {
+  const target = new Date('2026-06-06T18:50:00-06:00'); // 6:50 PM MDT
+  const diff = Math.max(0, target - new Date());
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+}
 
 function showDone() {
   const name = document.getElementById('successName').textContent;
@@ -238,8 +302,8 @@ function reset() {
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
-// Allow Enter key to submit
 document.addEventListener('DOMContentLoaded', () => {
+  checkGate();
   document.getElementById('emailInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') doEmailCheckin();
   });
