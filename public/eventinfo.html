@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Info — Lease End Party 2026</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a120b; color: #f5ece0; min-height: 100vh; }
+
+    /* NAV */
+    .nav { background: #120d07; border-bottom: 2px solid #3a2510; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 100; }
+    .nav-left { display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .nav-left::-webkit-scrollbar { display: none; }
+    .nav a { display: inline-block; padding: 14px 14px; font-size: 0.85rem; font-weight: 600; color: #8a7060; text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+    .nav a.active { color: #f5d080; border-bottom-color: #b8860b; }
+    .nav-logo { height: 28px; border-radius: 5px; flex-shrink: 0; margin-left: 8px; }
+
+    /* HERO */
+    .hero { background: linear-gradient(180deg, #120d07 0%, #1a120b 100%); text-align: center; padding: 36px 20px 28px; border-bottom: 1px solid #3a2510; }
+    .hero-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.18em; color: #7a6050; margin-bottom: 8px; }
+    .hero h1 { font-size: 2rem; font-weight: 900; color: #f5d080; margin-bottom: 6px; }
+    .hero-sub { font-size: 0.95rem; color: #c9a96e; }
+
+    /* CONTENT WRAPPER */
+    .content { max-width: 680px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* SECTION HEADER */
+    .section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: #7a6050; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: #2a1a0e; }
+
+    /* ── SCHEDULE TIMELINE ── */
+    .timeline { position: relative; padding-left: 28px; margin-bottom: 48px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: #3a2510; border-radius: 1px; }
+
+    .tl-item { position: relative; margin-bottom: 28px; }
+    .tl-item:last-child { margin-bottom: 0; }
+
+    .tl-dot { position: absolute; left: -24px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #3a2510; border: 2px solid #3a2510; flex-shrink: 0; }
+    .tl-dot.highlight { background: #b8860b; border-color: #b8860b; box-shadow: 0 0 8px rgba(184,134,11,0.5); }
+
+    .tl-time { font-size: 0.78rem; color: #7a6050; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 3px; }
+    .tl-title { font-size: 1.1rem; font-weight: 800; color: #f5ece0; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tl-body { font-size: 0.88rem; color: #9a8060; line-height: 1.6; }
+    .tl-bullets { list-style: none; padding: 0; margin-top: 4px; }
+    .tl-bullets li { font-size: 0.88rem; color: #9a8060; padding-left: 14px; position: relative; margin-bottom: 2px; line-height: 1.5; }
+    .tl-bullets li::before { content: '·'; position: absolute; left: 0; color: #5a4030; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+    .tag-alert { background: rgba(184,134,11,0.15); border: 1px solid rgba(184,134,11,0.4); color: #f5d080; }
+    .tag-end { background: rgba(60,160,60,0.12); border: 1px solid rgba(80,180,80,0.3); color: #90ee90; }
+
+    /* ── MENU ── */
+    .menu-section { margin-bottom: 36px; }
+    .menu-course { background: #2a1a0e; border: 1px solid #3a2510; border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; }
+    .menu-course-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: #b8860b; font-weight: 800; margin-bottom: 14px; }
+    .menu-item { padding: 9px 0; border-bottom: 1px solid #1a120b; }
+    .menu-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .menu-item-name { font-size: 0.95rem; font-weight: 700; color: #f5ece0; margin-bottom: 2px; }
+    .menu-item-desc { font-size: 0.82rem; color: #7a6050; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a href="/index.html">🏨 Hotel & Shuttle</a>
+    <a href="/eventinfo.html" class="active">🎉 Event Info</a>
+    <a href="/waivers.html">📋 Waivers</a>
+    <a href="/checkin.html">✅ Check-in</a>
+  </div>
+  <img src="/le-logo.png" class="nav-logo" alt="LE">
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Lease End Annual Party · Snowbasin 2026</div>
+  <h1>Tonight 🤠</h1>
+  <p class="hero-sub">Saturday, June 6 · 7:00 – 10:00 PM · Snowbasin Resort</p>
+</div>
+
+<div class="content">
+
+  <!-- SCHEDULE -->
+  <div class="section-label">Tonight's Schedule</div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-time">7:00 PM</div>
+      <div class="tl-title">Doors Open — Party Begins 🎉</div>
+      <ul class="tl-bullets">
+        <li>Food stations, bar, mini golf, and all activities are live</li>
+        <li>Check in and shop the company store with your swag tokens</li>
+        <li>Drop your raffle tickets in the raffle box for tonight's prizes</li>
+      </ul>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-time">7:00 – 8:00 PM</div>
+      <div class="tl-title">Drive Band — Set 1 🎸</div>
+      <div class="tl-body">Live music with line dancing</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-time">8:15 – 9:15 PM</div>
+      <div class="tl-title">Drive Band — Set 2 🎸</div>
+      <div class="tl-body">Band stays on stage through the program</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-time">9:15 – 9:45 PM</div>
+      <div class="tl-title">Speeches &amp; MVP Announcements <span class="tag tag-alert">Don't miss</span></div>
+      <div class="tl-body">5 MVPs recognized with prizes — plus a digital showcase</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-time">9:45 PM</div>
+      <div class="tl-title">Raffle Prize Announcements <span class="tag tag-alert">Don't miss</span></div>
+      <div class="tl-body">21 prizes announced — you must be present to win</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-time">9:45 PM</div>
+      <div class="tl-title">Shuttles Stage for Return 🚐</div>
+      <div class="tl-body">All vehicles ready at Snowbasin for the ride back to the Marriott</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-time">10:00 PM</div>
+      <div class="tl-title">Event Concludes <span class="tag tag-end">See you there!</span></div>
+    </div>
+
+  </div>
+
+  <!-- MENU -->
+  <div class="section-label">Dinner Menu</div>
+
+  <div class="menu-section">
+
+    <div class="menu-course">
+      <div class="menu-course-title">Appetizers</div>
+      <div class="menu-item">
+        <div class="menu-item-name">Jalapeño Poppers</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Bacon Wrapped &amp; Grilled Chicken</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Deviled Eggs</div>
+      </div>
+    </div>
+
+    <div class="menu-course">
+      <div class="menu-course-title">Custom BBQ Buffet</div>
+      <div class="menu-item">
+        <div class="menu-item-name">BBQ Chicken</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Brisket</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Charred Corn on the Cob</div>
+        <div class="menu-item-desc">Sweet chili, sriracha, lime &amp; garlic sauce</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Country-Style Coleslaw</div>
+        <div class="menu-item-desc">Shredded cabbage &amp; carrots, creamy sweet-tangy dressing</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Baked Beans</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Biscuits &amp; Honey</div>
+      </div>
+    </div>
+
+    <div class="menu-course">
+      <div class="menu-course-title">Dessert</div>
+      <div class="menu-item">
+        <div class="menu-item-name">Triple Berry Cobbler &amp; Peach Cobbler</div>
+        <div class="menu-item-desc">With ice cream &amp; chef attendant</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-name">Chocolate Chip Cookies</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
