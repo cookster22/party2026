@@ -51,6 +51,26 @@
     .tag-alert { background: rgba(184,134,11,0.15); border: 1px solid rgba(184,134,11,0.4); color: #f5d080; }
     .tag-end { background: rgba(60,160,60,0.12); border: 1px solid rgba(80,180,80,0.3); color: #90ee90; }
 
+    /* ── DETAILS GRID ── */
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 48px; }
+    @media (max-width: 480px) { .details-grid { grid-template-columns: 1fr; } }
+    .detail-card { background: #2a1a0e; border: 1px solid #3a2510; border-radius: 14px; padding: 18px 20px; }
+    .detail-icon { font-size: 1.4rem; margin-bottom: 8px; }
+    .detail-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: #7a6050; font-weight: 700; margin-bottom: 5px; }
+    .detail-value { font-size: 0.95rem; font-weight: 700; color: #f5ece0; line-height: 1.5; }
+    .detail-sub { font-size: 0.8rem; color: #7a6050; margin-top: 3px; line-height: 1.5; }
+
+    /* ── WAIVER CALLOUT ── */
+    .waiver-callout { background: rgba(184,134,11,0.08); border: 2px solid rgba(184,134,11,0.35); border-radius: 14px; padding: 20px 22px; margin-bottom: 48px; }
+    .waiver-callout-title { font-size: 1rem; font-weight: 800; color: #f5d080; margin-bottom: 6px; }
+    .waiver-callout-body { font-size: 0.88rem; color: #9a8060; line-height: 1.6; margin-bottom: 16px; }
+    .waiver-btns { display: flex; flex-direction: column; gap: 10px; }
+    .waiver-btn { display: block; padding: 13px 18px; border-radius: 10px; font-size: 0.9rem; font-weight: 700; text-decoration: none; text-align: center; transition: background 0.15s; }
+    .waiver-btn-required { background: rgba(76,175,80,0.12); border: 2px solid #4caf50; color: #90ee90; }
+    .waiver-btn-required:hover { background: rgba(76,175,80,0.25); }
+    .waiver-btn-optional { background: rgba(135,206,235,0.08); border: 1px solid rgba(135,206,235,0.35); color: #87ceeb; }
+    .waiver-btn-optional:hover { background: rgba(135,206,235,0.18); }
+
     /* ── MENU ── */
     .menu-section { margin-bottom: 36px; }
     .menu-course { background: #2a1a0e; border: 1px solid #3a2510; border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; }
@@ -80,6 +100,58 @@
 </div>
 
 <div class="content">
+
+  <!-- DETAILS -->
+  <div class="section-label">Party Details</div>
+
+  <div class="details-grid">
+    <div class="detail-card">
+      <div class="detail-icon">📅</div>
+      <div class="detail-label">Date &amp; Time</div>
+      <div class="detail-value">Saturday, June 6</div>
+      <div class="detail-sub">7:00 – 10:00 PM</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">📍</div>
+      <div class="detail-label">Location</div>
+      <div class="detail-value">Snowbasin Resort</div>
+      <div class="detail-sub">3925 E Snowbasin Rd, Huntsville, UT</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">🤠</div>
+      <div class="detail-label">Dress Code</div>
+      <div class="detail-value">Western Attire</div>
+      <div class="detail-sub">Encouraged but not required — boots, hats &amp; flannels welcome</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">🍺</div>
+      <div class="detail-label">Bar</div>
+      <div class="detail-value">Open Bar</div>
+      <div class="detail-sub">No cash needed · Valid ID required</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">🚐</div>
+      <div class="detail-label">Shuttle</div>
+      <div class="detail-value">Stage 6:15 PM · Depart 6:30 PM</div>
+      <div class="detail-sub">Departing from your hotel · Return shuttles stage at 9:45 PM</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">🅿️</div>
+      <div class="detail-label">Parking</div>
+      <div class="detail-value">Free Self-Parking</div>
+      <div class="detail-sub">Available on-site at Snowbasin, or take the shuttle</div>
+    </div>
+  </div>
+
+  <!-- WAIVER REMINDER -->
+  <div class="waiver-callout">
+    <div class="waiver-callout-title">⚠️ Don't Forget Your Waivers</div>
+    <div class="waiver-callout-body">Both waivers must be completed before you can participate in activities tonight. The Snowbasin waiver is <strong style="color:#f5d080;">required</strong> for entry — sign it now if you haven't already.</div>
+    <div class="waiver-btns">
+      <a class="waiver-btn waiver-btn-required" href="https://www.smartwaiver.com/v/n1qncqjkdme8eu3xud26h" target="_blank">📋 Sign Snowbasin Waiver — Required</a>
+      <a class="waiver-btn waiver-btn-optional" href="https://www.smartwaiver.com/v/hdbohnp4evpbp3y1unsdp7" target="_blank">🤠 Sign Buck Wild Waiver — Optional</a>
+    </div>
+  </div>
 
   <!-- SCHEDULE -->
   <div class="section-label">Tonight's Schedule</div>
