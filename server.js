@@ -703,7 +703,7 @@ const GUEST_LIST = [
   {name:"Dalton Wallace",email:"dalton.wallace@leaseend.com",vip:false,plusoneRsvp:true},
   {name:"Gavin Welch",email:"gavin.welch@leaseend.com",vip:false,plusoneRsvp:false},
   {name:"Kyle Whitchurch",email:"kyle.whitchurch@leaseend.com",vip:false,plusoneRsvp:true},
-  {name:"Audrey Williams",email:"audreyannawilliams@gmail.com",vip:false,plusoneRsvp:true},
+  {name:"Audrey Ramsey",email:"audreyannawilliams@gmail.com",vip:false,plusoneRsvp:true},
   {name:"Brandon Williams",email:"bw@leaseend.com",vip:true,plusoneRsvp:true},
   {name:"Corbin Williams",email:"corbin@leaseend.com",vip:false,plusoneRsvp:false},
   {name:"David Williams",email:"dave@leaseend.com",vip:true,plusoneRsvp:true},
