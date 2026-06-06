@@ -99,6 +99,49 @@
     .no-results { text-align: center; padding: 48px 20px; color: #5a4030; font-style: italic; }
     mark { background: rgba(184,134,11,0.35); color: inherit; border-radius: 2px; }
 
+    .badge-walkin { font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;
+      background: rgba(120,80,200,0.2); border: 1px solid rgba(160,120,240,0.4); color: #c8a8ff; letter-spacing: 0.04em; }
+
+    /* Add Attendee button */
+    .add-btn { padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border-radius: 8px;
+      border: 1px solid rgba(184,134,11,0.5); background: rgba(184,134,11,0.12); color: #f5d080;
+      cursor: pointer; white-space: nowrap; }
+    .add-btn:hover { background: rgba(184,134,11,0.25); }
+
+    /* Modal overlay */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #2a1a0e; border: 1px solid #4a3020; border-radius: 16px;
+      padding: 28px 24px; width: 100%; max-width: 400px; }
+    .modal h3 { color: #f5d080; font-size: 1.1rem; margin-bottom: 4px; }
+    .modal .modal-sub { font-size: 0.82rem; color: #7a6050; margin-bottom: 20px; }
+    .modal label { display: block; font-size: 0.75rem; color: #9a8060; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 6px; }
+    .modal input { width: 100%; padding: 12px 14px; font-size: 0.95rem; border-radius: 8px;
+      border: 2px solid #3a2510; background: #1a120b; color: #f5ece0; outline: none; margin-bottom: 14px; }
+    .modal input:focus { border-color: #b8860b; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+    .modal-btns button { flex: 1; padding: 13px; font-size: 0.9rem; font-weight: 700; border-radius: 10px; cursor: pointer; border: none; }
+    .modal-cancel { background: #1a120b; color: #7a6050; border: 1px solid #3a2510 !important; }
+    .modal-cancel:hover { color: #9a8060; }
+    .modal-submit { background: #b8860b; color: #1a120b; }
+    .modal-submit:hover { background: #d4a012; }
+    .modal-err { color: #ff8070; font-size: 0.82rem; margin-top: -8px; margin-bottom: 10px; min-height: 18px; }
+
+    /* Waiver links after add */
+    .waiver-result { text-align: center; }
+    .waiver-result .wr-name { font-size: 1.1rem; font-weight: 800; color: #90ee90; margin-bottom: 6px; }
+    .waiver-result .wr-sub { font-size: 0.85rem; color: #7a6050; margin-bottom: 20px; }
+    .waiver-link-btn { display: block; width: 100%; padding: 14px 18px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700; text-decoration: none; text-align: center;
+      margin-bottom: 10px; transition: background 0.15s; }
+    .waiver-link-required { background: rgba(76,175,80,0.12); border: 2px solid #4caf50; color: #90ee90; }
+    .waiver-link-required:hover { background: rgba(76,175,80,0.25); }
+    .waiver-link-optional { background: rgba(135,206,235,0.1); border: 2px solid rgba(135,206,235,0.4); color: #87ceeb; }
+    .waiver-link-optional:hover { background: rgba(135,206,235,0.2); }
+    .waiver-note { font-size: 0.75rem; color: #5a4030; margin-top: 8px; }
+
     /* Sync indicator */
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #4a3020; display: inline-block; margin-right: 6px; }
     .sync-dot.live { background: #4caf50; }
@@ -155,9 +198,52 @@
       <button class="filter-btn" onclick="setFilter('out',this)">⏳ Not In</button>
     </div>
     <button class="export-btn" onclick="doExport()">Export CSV</button>
+    <button class="add-btn" onclick="openAddModal()">+ Add Attendee</button>
   </div>
 
   <div class="guest-list" id="guestList"></div>
+</div>
+
+<!-- ADD ATTENDEE MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal" id="addModalInner">
+
+    <!-- STEP 1: Form -->
+    <div id="addForm">
+      <h3>➕ Add Attendee</h3>
+      <p class="modal-sub">Walk-in guest not on the RSVP list</p>
+      <label>First Name</label>
+      <input type="text" id="addFirst" placeholder="First" autocomplete="off">
+      <label>Last Name</label>
+      <input type="text" id="addLast" placeholder="Last" autocomplete="off">
+      <label>Email (optional)</label>
+      <input type="email" id="addEmail" placeholder="email@example.com" autocomplete="off">
+      <div class="modal-err" id="addErr"></div>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeAddModal()">Cancel</button>
+        <button class="modal-submit" onclick="submitAddGuest()">Add & Check In</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Waiver links -->
+    <div id="addSuccess" style="display:none;" class="waiver-result">
+      <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+      <div class="wr-name" id="addedName"></div>
+      <div class="wr-sub">Added &amp; checked in — send them the waiver links below</div>
+      <a class="waiver-link-btn waiver-link-required" href="https://www.smartwaiver.com/v/n1qncqjkdme8eu3xud26h" target="_blank">
+        📋 Snowbasin Waiver — Required
+      </a>
+      <a class="waiver-link-btn waiver-link-optional" href="https://www.smartwaiver.com/v/hdbohnp4evpbp3y1unsdp7" target="_blank">
+        🤠 Buck Wild Waiver — Optional
+      </a>
+      <p class="waiver-note">Tap a link above to open — or hand them your phone to scan &amp; sign</p>
+      <div class="modal-btns" style="margin-top:20px;">
+        <button class="modal-cancel" onclick="closeAddModal()">Done</button>
+        <button class="modal-submit" onclick="resetAddForm()">Add Another</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script>
@@ -273,7 +359,8 @@ function renderList() {
           <div class="guest-name ${g.checkedIn ? 'checked' : ''}">${hl(g.name, q)}</div>
           <div class="guest-badges">
             ${g.vip ? '<span class="badge-vip">⭐ VIP</span>' : ''}
-            ${g.checkedIn && time ? `<span class="badge-time">${time}${g.method==='self'?' · self':' · staff'}</span>` : ''}
+            ${g.walkin ? '<span class="badge-walkin">Walk-in</span>' : ''}
+            ${g.checkedIn && time ? `<span class="badge-time">${time}${g.method==='self'?' · self':g.method==='walkin'?' · walk-in':' · staff'}</span>` : ''}
             ${g.plusOne ? '<span class="badge-plusone">+1 ✓</span>' : ''}
           </div>
         </div>
@@ -322,6 +409,59 @@ function logout() {
   localStorage.removeItem('party_token');
   location.reload();
 }
+
+// ── Add Attendee modal ──────────────────────────────────────────────────────
+function openAddModal() {
+  resetAddForm();
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('addFirst').focus(), 50);
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function resetAddForm() {
+  document.getElementById('addFirst').value = '';
+  document.getElementById('addLast').value = '';
+  document.getElementById('addEmail').value = '';
+  document.getElementById('addErr').textContent = '';
+  document.getElementById('addForm').style.display = '';
+  document.getElementById('addSuccess').style.display = 'none';
+}
+
+async function submitAddGuest() {
+  const firstName = document.getElementById('addFirst').value.trim();
+  const lastName  = document.getElementById('addLast').value.trim();
+  const email     = document.getElementById('addEmail').value.trim();
+  if (!firstName || !lastName) {
+    document.getElementById('addErr').textContent = 'First and last name are required.';
+    return;
+  }
+  document.getElementById('addErr').textContent = '';
+
+  const r = await fetch('/api/add-guest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+    body: JSON.stringify({ firstName, lastName, email }),
+  });
+  const d = await r.json();
+  if (!d.success) {
+    document.getElementById('addErr').textContent = d.error || 'Something went wrong.';
+    return;
+  }
+
+  // Show success screen with waiver links
+  document.getElementById('addedName').textContent = d.name + (d.alreadyExisted ? ' (was already on list)' : '');
+  document.getElementById('addForm').style.display = 'none';
+  document.getElementById('addSuccess').style.display = '';
+  fetchGuests(); // refresh list
+}
+
+// Close modal on backdrop click
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddModal();
+});
 </script>
 </body>
 </html>

@@ -815,6 +815,30 @@ const server = http.createServer(async (req, res) => {
     return json(res, { success: true });
   }
 
+  // ── Add walk-in attendee (admin) ──
+  if (pathname === '/api/add-guest' && req.method === 'POST') {
+    if (!isAdmin(req)) return json(res, { error: 'Unauthorized' }, 401);
+    const { firstName, lastName, email } = await readBody(req);
+    if (!firstName || !lastName) return json(res, { error: 'Name required' }, 400);
+    const name = `${firstName.trim()} ${lastName.trim()}`;
+    const key  = (email || '').trim().toLowerCase() || `walkin-${Date.now()}@party.local`;
+    if (checkInState[key]) {
+      // Already exists — just check them in
+      checkInState[key].checkedIn = true;
+      checkInState[key].checkedInAt = new Date().toISOString();
+      checkInState[key].method = 'walkin';
+      saveNow();
+      return json(res, { success: true, name: checkInState[key].name, email: key, alreadyExisted: true });
+    }
+    checkInState[key] = {
+      name, email: key, vip: false, plusoneRsvp: false,
+      checkedIn: true, checkedInAt: new Date().toISOString(),
+      plusOne: false, method: 'walkin', walkin: true,
+    };
+    saveNow();
+    return json(res, { success: true, name, email: key });
+  }
+
   // ── Self-service plus-one (after self check-in) ──
   if (pathname === '/api/self-plusone' && req.method === 'POST') {
     const { email, value } = await readBody(req);
