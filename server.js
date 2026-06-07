@@ -744,9 +744,7 @@ function saveNow() {
 }
 
 function isCheckinOpen() {
-  // Opens at 6:50 PM Mountain Time (America/Denver)
-  const mt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
-  return mt.getHours() > 18 || (mt.getHours() === 18 && mt.getMinutes() >= 50);
+  return true; // Open now
 }
 
 function isAdmin(req) {
