@@ -222,12 +222,19 @@ function showDone() {
   show('doneScreen');
 }
 
+let submitting = false;
+
 async function doEmailCheckin() {
+  if (submitting) return;
   const email = document.getElementById('emailInput').value.trim().toLowerCase();
   if (!email) { showError('Please enter your email address.'); return; }
 
+  submitting = true;
   const btn = document.getElementById('checkinBtn');
-  btn.disabled = true; btn.textContent = 'Checking in…';
+  btn.disabled = true;
+  btn.textContent = '⏳ Checking in…';
+  btn.style.background = '#7a6030';
+  document.getElementById('emailError').textContent = '';
 
   try {
     const r = await fetch('/api/self-checkin', {
@@ -239,7 +246,7 @@ async function doEmailCheckin() {
 
     if (r.status === 404) {
       showError("Email not found. Please see a staff member at the check-in desk.");
-      btn.disabled = false; btn.textContent = 'Check Me In 🤠';
+      resetBtn(btn);
       return;
     }
     if (data.already) {
@@ -254,7 +261,14 @@ async function doEmailCheckin() {
   } catch(e) {
     showError('Connection error — please try again or see staff.');
   }
-  btn.disabled = false; btn.textContent = 'Check Me In 🤠';
+  resetBtn(btn);
+}
+
+function resetBtn(btn) {
+  submitting = false;
+  btn.disabled = false;
+  btn.textContent = 'Check Me In 🤠';
+  btn.style.background = '';
 }
 
 function showError(msg) {
